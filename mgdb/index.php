@@ -19,9 +19,6 @@
             require '../php/functions.php';
 
             use GuzzleHttp\Client;
-            use Psr\Http\Message\RequestInterface;
-            use Psr\Http\Message\ResponseInterface;
-            use Psr\Http\Message\UriInterface;
 
             $bookTitle = $_GET['title'];
 
@@ -52,47 +49,31 @@ HERE;
                 // Инициализация экземпляра класса для работы с удалённым веб-ресурсом
                 $client = new Client();
 
-                // Определение адреса после редиректа с помощью анонимной функции
-                $redirUrl = '';
-                $onRedirect = function(RequestInterface $request, ResponseInterface $response, UriInterface $uri) use (&$redirUrl) {
-                    $redirUrl = $uri;
-                };
+                // Если книга одна в каталоге, совершается редирект на отдельную страницу книги
+                // На этой странице есть biblionumber
+                // Если его нет, не было редиректа
+                $doc = new DOMDocument();
+                @$doc->loadHTMLFile('http://catalog.mgdb.ru:49001/cgi-bin/koha/opac-search.pl?idx=kw&q='.$bookTitle);
+                $xpath = new DOMXpath($doc);
+                $biblionumber = $xpath->query('//*[@id="gbs-thumbnail-preview"]/@title')[0]->nodeValue;
 
-                // Запрос по исходному адресу, получение ответа
-                $response = $client->request('GET', 'http://catalog.mgdb.ru:49001/cgi-bin/koha/opac-search.pl?idx=kw&q='.$bookTitle, [
-                    'allow_redirects' => [
-                        'strict'          => true,      // use "strict" RFC compliant redirects.
-                        'referer'         => true,      // add a Referer header
-                        'on_redirect'     => $onRedirect,
-                        'track_redirects' => true
-                    ]
-                ]);
-
-                if ($redirUrl) {
-                    // Получение из адреса после редиректа значения параметра biblionumber
-                    $query = [];
-                    parse_str(parse_url($redirUrl, PHP_URL_QUERY), $query);
-
+                if ($biblionumber) {
                     // Определение ISBN, количества всех книг, количества книг на руках
-                    $docNormal = new DOMDocument();
-                    @$docNormal->loadHTMLFile('http://catalog.mgdb.ru:49001/cgi-bin/koha/opac-detail.pl?biblionumber='.$query['biblionumber']);
-                    $xpathNormal = new DOMXpath($docNormal);
-
-                    $ISBNMGDB = $xpathNormal->query("//span[@class='results_summary'][span='ISBN: ']/text()")[0]->nodeValue;
+                    $ISBNMGDB = $xpath->query("//span[@class='results_summary'][span='ISBN: ']/text()")[0]->nodeValue;
                     $ISBNMGDB = preg_replace("/[^0-9]/", '', $ISBNMGDB);
 
-                    $bookStatus = $xpathNormal->query("//table[@id='holdingst']/tbody/tr/td[2][starts-with(., 'Абонемент')]/../td[4][contains(text(),'Available')]")->length;
-                    $bookStatusOnHands = $xpathNormal->query("//table[@id='holdingst']/tbody/tr/td[2][starts-with(., 'Абонемент')]/../td[4][contains(text(),'Checked out')]")->length;
+                    $bookStatus = $xpath->query("//table[@id='holdingst']/tbody/tr/td[2][starts-with(., 'Абонемент')]/../td[4][contains(text(),'Available')]")->length;
+                    $bookStatusOnHands = $xpath->query("//table[@id='holdingst']/tbody/tr/td[2][starts-with(., 'Абонемент')]/../td[4][contains(text(),'Checked out')]")->length;
 
                     // Если есть книги на руках, определение даты возврата
                     if ($bookStatusOnHands > 0) {
                         if ($bookStatusOnHands == 1) {
-                            $bookStatusOnHandsDate = $xpathNormal->query("//table[@id='holdingst']/tbody/tr/td[5]/text()")[0]->nodeValue;
+                            $bookStatusOnHandsDate = $xpath->query("//table[@id='holdingst']/tbody/tr/td[5]/text()")[0]->nodeValue;
                         }
                         else {
                             $i = 0;
                             while ($i < $bookStatusOnHands) {
-                                $bookStatusOnHandsDate .= $xpathNormal->query("//table[@id='holdingst']/tbody/tr/td[5]/text()")[$i]->nodeValue;
+                                $bookStatusOnHandsDate .= $xpath->query("//table[@id='holdingst']/tbody/tr/td[5]/text()")[$i]->nodeValue;
                                 if ($i + 1 != $bookStatusOnHands) {
                                     $bookStatusOnHandsDate .=  ', ';
                                 }
@@ -105,7 +86,7 @@ HERE;
 
                     // Определение библиографических сведений
                     $docMarc = new DOMDocument();
-                    @$docMarc->loadHTMLFile('http://catalog.mgdb.ru:49001/cgi-bin/koha/opac-MARCdetail.pl?biblionumber='.$query['biblionumber']);
+                    @$docMarc->loadHTMLFile('http://catalog.mgdb.ru:49001/cgi-bin/koha/opac-MARCdetail.pl?biblionumber='.$biblionumber);
                     $xpath = new DOMXpath($docMarc);
 
                     $titleMGDB = $xpath->query("//tr[td='Основное заглавие']/td[2]")[0]->nodeValue;
