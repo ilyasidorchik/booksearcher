@@ -263,14 +263,16 @@ nav {
         }
 
         .library {
-            .clearfix;
-            padding: 10px 0px 20px 10px;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 10px 20px;
             background: #f0f0f0;
             border-bottom: 1px solid rgba(0,0,0,.08);
 
             .libraryDesc {
-                float: left;
-                width: 50%;
+                .name {
+                    font-weight: bold;
+                }
 
                 .details {
                     .timetable {
@@ -291,11 +293,13 @@ nav {
             }
 
             .libraryBooking {
-                float: left;
+                max-width: 275px;
                 padding-left: 20px;
 
-                .status {
-                    font-style: italic;
+                .availabilityAtHome.comma {
+                    &::after {
+                        content: ',';
+                    }
                 }
             }
 

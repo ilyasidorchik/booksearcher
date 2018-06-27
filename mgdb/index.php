@@ -53,124 +53,42 @@ HERE;
                 // На этой странице есть biblionumber
                 // Если его нет, не было редиректа
                 $doc = new DOMDocument();
-                @$doc->loadHTMLFile('http://catalog.mgdb.ru:49001/cgi-bin/koha/opac-search.pl?idx=kw&q='.$bookTitle);
+                @$doc->loadHTMLFile('http://catalog.mgdb.ru:49001/cgi-bin/koha/opac-search.pl?limit=branch:CGDB-AB&idx=kw&q='.$bookTitle);
                 $xpath = new DOMXpath($doc);
-                $biblionumber = $xpath->query('//*[@id="gbs-thumbnail-preview"]/@title')[0]->nodeValue;
 
-                if ($biblionumber) {
-                    // Определение ISBN, количества всех книг, количества книг на руках
-                    $ISBNMGDB = $xpath->query("//span[@class='results_summary'][span='ISBN: ']/text()")[0]->nodeValue;
-                    $ISBNMGDB = preg_replace("/[^0-9]/", '', $ISBNMGDB);
+                $findNoFound = $xpath->query("//strong[text() = 'No Results Found!']")->length;
 
-                    $bookStatus = $xpath->query("//table[@id='holdingst']/tbody/tr/td[2][starts-with(., 'Абонемент')]/../td[4][contains(text(),'Available')]")->length;
-                    $bookStatusOnHands = $xpath->query("//table[@id='holdingst']/tbody/tr/td[2][starts-with(., 'Абонемент')]/../td[4][contains(text(),'Checked out')]")->length;
+                // Что-то найдено
+                if (!$findNoFound) {
+                    $booksCount = $xpath->query('//*[@name="biblionumber"]')->length;
 
-                    // Если есть книги на руках, определение даты возврата
-                    if ($bookStatusOnHands > 0) {
-                        if ($bookStatusOnHands == 1) {
-                            $bookStatusOnHandsDate = $xpath->query("//table[@id='holdingst']/tbody/tr/td[5]/text()")[0]->nodeValue;
-                        }
-                        else {
-                            $i = 0;
-                            while ($i < $bookStatusOnHands) {
-                                $bookStatusOnHandsDate .= $xpath->query("//table[@id='holdingst']/tbody/tr/td[5]/text()")[$i]->nodeValue;
-                                if ($i + 1 != $bookStatusOnHands) {
-                                    $bookStatusOnHandsDate .=  ', ';
-                                }
-                                $i++;
-                            }
-                        }
+                    // Если книга одна в библиотеке
+                    if ($booksCount === 0)
+                        $booksCount += 1;
 
-                        $bookStatusOnHandsDate = str_replace('/', '.', $bookStatusOnHandsDate);
-                    }
+                    // Вывод карточек с информацией о книге и библиотеке
+                    for ($bookI = 0; $bookI < $booksCount; $bookI++) {
+                        // Определение $biblionumber
+                        // Если книга не одна в библиотеке
+                        if ($booksCount > 1)
+                            $biblionumber = $xpath->query('//*[@name="biblionumber"]/@value')[$bookI]->nodeValue;
+                        // Если книга одна
+                        else
+                            $biblionumber = $xpath->query('//*[@id="gbs-thumbnail-preview"]/@title')[0]->nodeValue;
 
-                    // Определение библиографических сведений
-                    $docMarc = new DOMDocument();
-                    @$docMarc->loadHTMLFile('http://catalog.mgdb.ru:49001/cgi-bin/koha/opac-MARCdetail.pl?biblionumber='.$biblionumber);
-                    $xpath = new DOMXpath($docMarc);
+                        // Вывод карточки
+                        $bookInfo = getBookInfo('Деловая библиотека', $biblionumber);
+                        printBook($bookInfo);
 
-                    $titleMGDB = $xpath->query("//tr[td='Основное заглавие']/td[2]")[0]->nodeValue;
+                        $libraryInfo = getLibraryInfo('Деловая библиотека', $biblionumber);
+                        printLibrary($libraryInfo);
 
-                    $author1Dirty = $xpath->query("//tr[td='Часть имени, кроме начального элемента ввода']/td[2]")[0]->nodeValue;
-                    $author2Dirty = $xpath->query("//tr[td='Начальный элемент ввода']/td[2]")[0]->nodeValue;
-                    $author1Dirty1 = str_replace(' ', '', $author1Dirty);
-                    $authorMGDB = str_replace('.', '. ', $author1Dirty1) . $author2Dirty;
-
-                    $publisherMGDB = $xpath->query("//tr[td='Издательство']/td[2]")[0]->nodeValue;
-
-                    $yearMGDB = $xpath->query("//tr[td='Дата издания, распространения и т.д.']/td[2]")[0]->nodeValue;
-
-                    $pages = $xpath->query("//tr[td='Объем и специфическое обозначение материала']/td[2]")[0]->nodeValue;
-                    $pagesMGDB = preg_replace("/[^0-9]/", '', $pages) . ' стр.';
-
-                    $titleTypografed = typograf($titleMGDB);
-
-                    echo <<<HERE
-                        <div class="bookContainer">
-                            <div class="row">
-                                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-8">
-                                    <div class="book">
-                                        <div class="bookDesc">
-                                            <h2>$titleTypografed</h2>
-                                            <div class="details lead">
-                                                <span class="author">$authorMGDB</span>
-                                                <span class="publisher">$publisherMGDB, $yearMGDB</span>
-                                                <span class="pages">$pagesMGDB</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-HERE;
-
-                    $libraryMGDB = [
-                        "name" => "Деловая библиотека",
-                        "address" => "м. ВДНХ, ул. Бориса Галушкина, 19к1",
-                        "timetable" => "http://mgdb.mos.ru/contacts/info/"
-                    ];
-
-                    echo <<<HERE
-                        <div class="row">
-                            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-8">
-                                <div class="library">
-                                    <div class="libraryDesc">
-                                        <div class="name"><b>$libraryMGDB[name]</b></div>
-                                        <div class="details">
-                                            <div class="address">$libraryMGDB[address]</div>
-                                            <div class="timetable">
-                                                <!--<span class="timetable-item today">Сегодня до 22</span>-->
-                                                <a href="$libraryMGDB[timetable]" class="timetable-item link">Режим работы</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="libraryBooking">
-HERE;
-
-                    if ($bookStatusOnHands > 0)
-                        $bookStatusOnHands = '<br>На руках: ' . $bookStatusOnHands . ' шт.' . ' до ' . $bookStatusOnHandsDate;
-                    elseif ($bookStatusOnHands == 0)
-                        $bookStatusOnHands = '';
-
-                    echo <<<HERE
-                                        <div class="status small">Доступно: $bookStatus шт$bookStatusOnHands</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-HERE;
-                }
-                else {
-                    $docList = new DOMDocument();
-                    @$docList->loadHTMLFile('http://catalog.mgdb.ru:49001/cgi-bin/koha/opac-search.pl?idx=kw&q='.$bookTitle);
-                    $xpathList = new DOMXpath($docList);
-                    $findNoFound = $xpathList->query("//strong[text() = 'No Results Found!']")->length;
-                    if ($findNoFound) {
-                        $findNoFoundStatus = 'Такой книги нет в каталоге ЦГДБ';
-                    }
-                    else {
-                        $findNoFoundStatus = 'В каталогах есть несколько книг с названием, похожим на ваше. Но для такого сценария программист ещё не написал код :-(';
+                        printBookContainerEnd();
                     }
                 }
+                // Ничего не найдено
+                else
+                    echo 'Такой книги нет в Деловой библиотеке';
             }
         ?>
     </body>

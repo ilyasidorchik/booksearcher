@@ -1,82 +1,260 @@
 <?php
-    function getBookInfo($html, $infoType) {
-        switch ($infoType) {
-            case 'ISBN':
-                preg_match('/<ISBN:>\s+([\d-]+)/', $html, $matches);
-                $ISBN = preg_replace("/[^0-9]/", '', $matches[1]);
-                return $ISBN;
-            case 'title':
-                preg_match('/к заглавию:> (.*)",\n"<Ответственность/', $html, $matches);
-                $title2 = $matches[1];
-                if ($title2) {
-                    preg_match('/<Основное заглавие:> (.*?)"/', $html, $matches);
-                    $title1 = $matches[1];
-                    if (strpos($title2, '[') === 0)
-                        $title2 = null;
-                    else {
-                        $title2 = str_replace('\\', '', $title2);
-                        $title2 = '. ' . makeFirstLetterCapital($title2);
-                    }
-                }
-                else {
-                    preg_match('/заглавие:> (.*)"/', $html, $matches);
-                    $title1 = $matches[1];
-                    $title1 = str_replace('\\', '', $title1);
-                }
-                $title = $title1 . $title2;
-                $title = str_replace('!.', '!', $title);
-                return $title;
-            case 'publisher':
-                preg_match('/<Издательство:> (.*?)\[\/i]"/', $html, $matches);
-                $publisher = $matches[1];
-                $publisher = str_replace(['[i class=PU]', '[/i]'], '', $publisher);
-                $publisher = str_replace('\\"', '', $publisher);
-                $publisher = str_replace('ООО ', '', $publisher);
-                if ($publisher == 'Э' || $publisher == 'ЭКСМО')
-                    $publisher = 'Эксмо';
-                if ($publisher == 'Альпина Паблишерз')
-                    $publisher = 'Альпина Паблишер';
-                return $publisher;
-            case 'year':
-                preg_match('/<Дата издания:> (.*?)"/', $html, $matches);
-                return $matches[1];
-            case 'pages':
-                preg_match('/<Объем:> (.*?)"/', $html, $matches);
-                $pagesOriginally = $matches[1];
-                $pos = strpos($pagesOriginally, ',');
-                if($pos) {
-                    $pages = '';
-                    for ($i = 0; $i < $pos; $i++) {
-                        $pages .= $pagesOriginally[$i];
-                    }
-                    $pages = preg_replace("/[^0-9]/", '', $pages);
-                }
-                else {
-                    $pages = preg_replace("/[^0-9]/", '', $pagesOriginally);
-                }
-                $pages .= ' стр.';
-                return $pages;
-            case 'author':
-                preg_match('/<Ответственность:> (.*?)"/', $html, $matches);
-                if($matches[1]) {
-                    $author = $matches[1];
-                    // Если начинается с квадратной скобки или содержит переводчика — назначаем автора из Автора
-                    if (strpos($author, '[') === 0 || strpos($author, 'пер.') === 0) {
-                        preg_match('/<Автор:> ?(.*?)"/', $html, $matches);
-                        $author  = str_replace(['[i class=RP]', '[/i]'], '', $matches[1]);
-                    }
-                }
-                else {
-                    preg_match('/<Автор:> ?(.*?)"/', $html, $matches);
-                    $author  = str_replace(['[i class=RP]', '[/i]'], '', $matches[1]);
-                }
-                if (substr_count($author, ' ') <= 2) {
-                    // Вместо «Сидорчик, Илья» — «Илья Сидорчик»
-                    $author = explode(', ', $author);
-                    $author = $author[1] . ' ' . $author[0];
-                }
-                return $author;
+    function getBookInfo($library, $source) {
+        switch ($library) {
+            case 'Деловая библиотека':
+                $docNormal = new DOMDocument();
+                @$docNormal->loadHTMLFile('http://catalog.mgdb.ru:49001/cgi-bin/koha/opac-detail.pl?biblionumber='.$source);
+                $xpathNormal = new DOMXpath($docNormal);
+
+                // Получение информации о книги с первой страницы
+                $ISBN = $xpathNormal->query("//span[@class='results_summary'][span='ISBN: ']/text()")[0]->nodeValue;
+                $ISBN = preg_replace("/[^0-9]/", '', $ISBN);
+
+                // Получение информации о книги со страницы Марк-вью
+                $docMarc = new DOMDocument();
+                @$docMarc->loadHTMLFile('http://catalog.mgdb.ru:49001/cgi-bin/koha/opac-MARCdetail.pl?biblionumber='.$source);
+                $xpathMarc = new DOMXpath($docMarc);
+
+                $title = $xpathMarc->query("//tr[td='Основное заглавие']/td[2]")[0]->nodeValue;
+                $titleTypografed = typograf($title);
+
+                $author1Dirty = $xpathMarc->query("//tr[td='Часть имени, кроме начального элемента ввода']/td[2]")[0]->nodeValue;
+                $author2Dirty = $xpathMarc->query("//tr[td='Начальный элемент ввода']/td[2]")[0]->nodeValue;
+                $author1Dirty1 = str_replace(' ', '', $author1Dirty);
+                $author = str_replace('.', '. ', $author1Dirty1) . $author2Dirty;
+
+                $publisher = $xpathMarc->query("//tr[td='Издательство']/td[2]")[0]->nodeValue;
+
+                $year = $xpathMarc->query("//tr[td='Дата издания, распространения и т.д.']/td[2]")[0]->nodeValue;
+
+                $pages = $xpathMarc->query("//tr[td='Объем и специфическое обозначение материала']/td[2]")[0]->nodeValue;
+                $pages = preg_replace("/[^0-9]/", '', $pages) . ' стр.';
+
+                $bookInfo = [
+                    "ISBN" => $ISBN,
+                    "title" => $title,
+                    "titleTypografed" => $titleTypografed,
+                    "author" => $author,
+                    "publisher" => $publisher,
+                    "year" => $year,
+                    "pages" => $pages,
+                    "availability" => $availability,
+                    "availabilityOnHands" => $availabilityOnHands,
+                    "availabilityOnHandsDate" => $availabilityOnHandsDate,
+                    "availabilityInfo" => $libraryBooking
+                ];
+
+                return $bookInfo;
         }
+    }
+
+    /*function getBookInfo($library, $infoType, $source) {
+        switch ($library) {
+            case 'Деловая библиотека':
+                $author1Dirty = $source->query("//tr[td='Часть имени, кроме начального элемента ввода']/td[2]")[0]->nodeValue;
+                $author2Dirty = $source->query("//tr[td='Начальный элемент ввода']/td[2]")[0]->nodeValue;
+                $author1Dirty1 = str_replace(' ', '', $author1Dirty);
+                $authorMGDB = str_replace('.', '. ', $author1Dirty1) . $author2Dirty;
+                return $authorMGDB;
+            default:
+                switch ($infoType) {
+                    case 'ISBN':
+                        preg_match('/<ISBN:>\s+([\d-]+)/', $source, $matches);
+                        $ISBN = preg_replace("/[^0-9]/", '', $matches[1]);
+                        return $ISBN;
+                    case 'title':
+                        preg_match('/к заглавию:> (.*)",\n"<Ответственность/', $source, $matches);
+                        $title2 = $matches[1];
+                        if ($title2) {
+                            preg_match('/<Основное заглавие:> (.*?)"/', $source, $matches);
+                            $title1 = $matches[1];
+                            if (strpos($title2, '[') === 0)
+                                $title2 = null;
+                            else {
+                                $title2 = str_replace('\\', '', $title2);
+                                $title2 = '. ' . makeFirstLetterCapital($title2);
+                            }
+                        }
+                        else {
+                            preg_match('/заглавие:> (.*)"/', $source, $matches);
+                            $title1 = $matches[1];
+                            $title1 = str_replace('\\', '', $title1);
+                        }
+                        $title = $title1 . $title2;
+                        $title = str_replace('!.', '!', $title);
+                        return $title;
+                    case 'publisher':
+                        preg_match('/<Издательство:> (.*?)\[\/i]"/', $source, $matches);
+                        $publisher = $matches[1];
+                        $publisher = str_replace(['[i class=PU]', '[/i]'], '', $publisher);
+                        $publisher = str_replace('\\"', '', $publisher);
+                        $publisher = str_replace('ООО ', '', $publisher);
+                        if ($publisher == 'Э' || $publisher == 'ЭКСМО')
+                            $publisher = 'Эксмо';
+                        if ($publisher == 'Альпина Паблишерз')
+                            $publisher = 'Альпина Паблишер';
+                        return $publisher;
+                    case 'year':
+                        preg_match('/<Дата издания:> (.*?)"/', $source, $matches);
+                        return $matches[1];
+                    case 'pages':
+                        preg_match('/<Объем:> (.*?)"/', $source, $matches);
+                        $pagesOriginally = $matches[1];
+                        $pos = strpos($pagesOriginally, ',');
+                        if($pos) {
+                            $pages = '';
+                            for ($i = 0; $i < $pos; $i++) {
+                                $pages .= $pagesOriginally[$i];
+                            }
+                            $pages = preg_replace("/[^0-9]/", '', $pages);
+                        }
+                        else {
+                            $pages = preg_replace("/[^0-9]/", '', $pagesOriginally);
+                        }
+                        $pages .= ' стр.';
+                        return $pages;
+                    case 'author':
+                        preg_match('/<Ответственность:> (.*?)"/', $source, $matches);
+                        if($matches[1]) {
+                            $author = $matches[1];
+                            // Если начинается с квадратной скобки или содержит переводчика — назначаем автора из Автора
+                            if (strpos($author, '[') === 0 || strpos($author, 'пер.') === 0) {
+                                preg_match('/<Автор:> ?(.*?)"/', $source, $matches);
+                                $author  = str_replace(['[i class=RP]', '[/i]'], '', $matches[1]);
+                            }
+                        }
+                        else {
+                            preg_match('/<Автор:> ?(.*?)"/', $source, $matches);
+                            $author  = str_replace(['[i class=RP]', '[/i]'], '', $matches[1]);
+                        }
+                        if (substr_count($author, ' ') <= 2) {
+                            // Вместо «Сидорчик, Илья» — «Илья Сидорчик»
+                            $author = explode(', ', $author);
+                            $author = $author[1] . ' ' . $author[0];
+                        }
+                        return $author;
+                }
+        }
+    }*/
+
+    function getLibraryInfo($library, $source) {
+        switch ($library) {
+            case 'Деловая библиотека':
+                $docNormal = new DOMDocument();
+                @$docNormal->loadHTMLFile('http://catalog.mgdb.ru:49001/cgi-bin/koha/opac-detail.pl?biblionumber='.$source);
+                $xpathNormal = new DOMXpath($docNormal);
+
+                $availability = $xpathNormal->query("//table[@id='holdingst']/tbody/tr/td[2][starts-with(., 'Абонемент')]/../td[4][contains(text(),' Available ')]")->length;
+                $availabilityOnHands = $xpathNormal->query("//table[@id='holdingst']/tbody/tr/td[2][starts-with(., 'Абонемент')]/../td[4][contains(text(),'Checked out')]")->length;
+
+                // Если есть книги на руках, определение даты возврата
+                if ($availabilityOnHands > 0) {
+                    if ($availabilityOnHands === 1)
+                        $availabilityOnHandsDate = $xpathNormal->query("//table[@id='holdingst']/tbody/tr/td[5]/text()")[0]->nodeValue;
+                    else {
+                        $i = 0;
+                        $availabilityOnHandsDate = 0;
+                        while ($i < $availabilityOnHands) {
+                            $availabilityOnHandsDate .= $xpathNormal->query("//table[@id='holdingst']/tbody/tr/td[5]/text()")[$i]->nodeValue;
+                            if ($i + 1 != $availabilityOnHands)
+                                $availabilityOnHandsDate .=  ',<br>';
+                            $i++;
+                        }
+                    }
+
+                    $availabilityOnHandsDate = str_replace('/', '.', $availabilityOnHandsDate);
+                }
+
+
+                // Формирование дива .libraryBooking о доступности
+                if ($availability > 0)  {
+                    $availabilityInfo = $availability . ' книг';
+                    switch ($availability) {
+                        case 1:
+                            $availabilityInfo .= 'а';
+                            break;
+                        case 2:case 3:case 4:
+                        $availabilityInfo .= 'и';
+                    }
+
+                    $availabilityInfo .= " для выдачи на дом";
+
+                    $libraryBooking = '<div class="availabilityAtHome';
+
+                    if ($availabilityOnHands)
+                        $libraryBooking .= ' comma';
+
+                    $libraryBooking .= '">'.$availabilityInfo.'</div>';
+
+                    if ($availabilityOnHands)
+                        $availabilityOnHandsInfo = "$availabilityOnHands на руках до $availabilityOnHandsDate";
+                }
+                else {
+                    if ($availabilityOnHands) {
+                        if ($availabilityOnHands === 1)
+                            $availabilityOnHandsInfo = "На руках до $availabilityOnHandsDate";
+                        else {
+                            $availabilityOnHandsInfo = "На руках $availabilityOnHands книг";
+                            if ($availabilityOnHands < 5)
+                                $availabilityOnHandsInfo .= "и";
+                            $availabilityOnHandsInfo .= " до $availabilityOnHandsDate";
+                        }
+                    }
+                }
+
+                if ($availabilityOnHands)
+                    $libraryBooking .= "<div class='availabilityOnHands'>$availabilityOnHandsInfo</div>";
+
+                $libraryBooking = "<div class='libraryBooking'>$libraryBooking</div>";
+
+                return $library = [
+                    "name" => "Деловая библиотека",
+                    "address" => "м. ВДНХ, ул. Бориса Галушкина, 19к1",
+                    "timetable" => "http://mgdb.mos.ru/contacts/info/",
+                    "availability" => $libraryBooking
+                ];
+        }
+    }
+
+    function printBook($bookInfo) {
+        echo <<<HERE
+            <div class="bookContainer">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 col-lg-12 col-xl-8">
+                        <div class="book">
+                            <div class="bookDesc">
+                                <h2>$bookInfo[titleTypografed]</h2>
+                                <div class="details lead">
+                                    <span class="author">$bookInfo[author]</span>
+                                    <span class="publisher">$bookInfo[publisher], $bookInfo[year]</span>
+                                    <span class="pages">$bookInfo[pages]</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+HERE;
+    }
+
+    function printLibrary($libraryInfo) {
+        echo <<<HERE
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-8">
+                    <div class="library">
+                        <div class="libraryDesc">
+                            <div class="name">$libraryInfo[name]</div>
+                            <div class="details">
+                                <div class="address">$libraryInfo[address]</div>
+                                <div class="timetable">
+                                    <a class="timetable-item link" href="$libraryInfo[timetable]">Режим работы</a>
+                                </div>
+                            </div>
+                        </div>
+                        $libraryInfo[availability]
+                    </div>
+                </div>
+            </div>
+HERE;
     }
 
     function isLibraryFit($xpathSKBM, $bookI) {
@@ -234,6 +412,10 @@
 HERE;
     }
 
+    function printBookContainerEnd() {
+        echo '</div>';
+    }
+
     function findAddressWithMetro($libraryFullAddress) {
         // Для библиотек-одиночек нет адреса
         if ($libraryFullAddress == 'Россия, Москва') {
@@ -326,8 +508,8 @@ HERE;
         return $str;
     }
 
+    include 'remotetypograf.php';
     function typograf($str) {
-        require 'remotetypograf.php';
         $remoteTypograf = new RemoteTypograf('UTF-8');
         $strTypografed = $remoteTypograf->processText($str);
         $strTypografed = strip_tags($strTypografed);
