@@ -149,7 +149,6 @@
                         $availabilityOnHandsDate = $xpathNormal->query("//table[@id='holdingst']/tbody/tr/td[5]/text()")[0]->nodeValue;
                     else {
                         $i = 0;
-                        $availabilityOnHandsDate = 0;
                         while ($i < $availabilityOnHands) {
                             $availabilityOnHandsDate .= $xpathNormal->query("//table[@id='holdingst']/tbody/tr/td[5]/text()")[$i]->nodeValue;
                             if ($i + 1 != $availabilityOnHands)
