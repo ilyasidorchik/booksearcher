@@ -53,38 +53,30 @@ HERE;
                 // На этой странице есть biblionumber
                 // Если его нет, не было редиректа
                 $doc = new DOMDocument();
-                @$doc->loadHTMLFile("http://catalog.mgdb.ru:49001/cgi-bin/koha/opac-search.pl?limit=branch:CGDB-AB&idx=kw&q=$bookTitle");
+                $url = "http://catalog.mgdb.ru:49001/cgi-bin/koha/opac-search.pl?limit=branch:CGDB-AB&idx=kw&q=$bookTitle";
+                @$doc->loadHTMLFile($url);
                 $xpath = new DOMXpath($doc);
 
                 $findNoFound = $xpath->query("//strong[text() = 'No Results Found!']")->length;
 
                 // Что-то найдено
                 if (!$findNoFound) {
+                    // Ищем количество серпов
                     $pages = $xpath->query('//*[@id="userresults"]/div[2]/a[@class="nav"]')->length * 20;
 
-                    if ($pages) {
-                        for ($page = 0; $page < $pages; $page += 20) {
-                            @$doc->loadHTMLFile("http://catalog.mgdb.ru:49001/cgi-bin/koha/opac-search.pl?limit=branch:CGDB-AB&idx=kw&q=$bookTitle&offset=$page");
+                    // Если серпов 0 — значит одна страница
+                    if (!$pages)
+                        $pages = 1;
+
+                    // $page увеличиваем на 20, потому что так меняется урл у следующих страниц
+                    for ($page = 0; $page < $pages; $page += 20) {
+                        // Если страница первая или только одна — продолжаем брать информацию с загруженной страницы
+                        // Если страница не первая — грузим новую
+                        if ($page !== 0 || $pages !== 1) {
+                            @$doc->loadHTMLFile("$url&offset=$page");
                             $xpath = new DOMXpath($doc);
-
-                            $booksCount = $xpath->query('//*[@name="biblionumber"]')->length;
-
-                            // Вывод карточек с информацией о книге и библиотеке
-                            for ($bookI = 0; $bookI < $booksCount; $bookI++) {
-                                $biblionumber = $xpath->query('//*[@name="biblionumber"]/@value')[$bookI]->nodeValue;
-
-                                // Вывод карточки
-                                $bookInfo = getBookInfo('Деловая библиотека', $biblionumber);
-                                printBook($bookInfo);
-
-                                $libraryInfo = getLibraryInfo('Деловая библиотека', $biblionumber);
-                                printLibrary($libraryInfo);
-
-                                printBookContainerEnd();
-                            }
                         }
-                    }
-                    else {
+
                         $booksCount = $xpath->query('//*[@name="biblionumber"]')->length;
 
                         // Если книга одна в библиотеке

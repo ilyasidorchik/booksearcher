@@ -37,11 +37,7 @@
                     "author" => $author,
                     "publisher" => $publisher,
                     "year" => $year,
-                    "pages" => $pages,
-                    "availability" => $availability,
-                    "availabilityOnHands" => $availabilityOnHands,
-                    "availabilityOnHandsDate" => $availabilityOnHandsDate,
-                    "availabilityInfo" => $libraryBooking
+                    "pages" => $pages
                 ];
 
                 return $bookInfo;
