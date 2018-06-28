@@ -53,37 +53,63 @@ HERE;
                 // На этой странице есть biblionumber
                 // Если его нет, не было редиректа
                 $doc = new DOMDocument();
-                @$doc->loadHTMLFile('http://catalog.mgdb.ru:49001/cgi-bin/koha/opac-search.pl?limit=branch:CGDB-AB&idx=kw&q='.$bookTitle);
+                @$doc->loadHTMLFile("http://catalog.mgdb.ru:49001/cgi-bin/koha/opac-search.pl?limit=branch:CGDB-AB&idx=kw&q=$bookTitle");
                 $xpath = new DOMXpath($doc);
 
                 $findNoFound = $xpath->query("//strong[text() = 'No Results Found!']")->length;
 
                 // Что-то найдено
                 if (!$findNoFound) {
-                    $booksCount = $xpath->query('//*[@name="biblionumber"]')->length;
+                    $pages = $xpath->query('//*[@id="userresults"]/div[2]/a[@class="nav"]')->length * 20;
 
-                    // Если книга одна в библиотеке
-                    if ($booksCount === 0)
-                        $booksCount += 1;
+                    if ($pages) {
+                        for ($page = 0; $page < $pages; $page += 20) {
+                            @$doc->loadHTMLFile("http://catalog.mgdb.ru:49001/cgi-bin/koha/opac-search.pl?limit=branch:CGDB-AB&idx=kw&q=$bookTitle&offset=$page");
+                            $xpath = new DOMXpath($doc);
 
-                    // Вывод карточек с информацией о книге и библиотеке
-                    for ($bookI = 0; $bookI < $booksCount; $bookI++) {
-                        // Определение $biblionumber
-                        // Если книга не одна в библиотеке
-                        if ($booksCount > 1)
-                            $biblionumber = $xpath->query('//*[@name="biblionumber"]/@value')[$bookI]->nodeValue;
-                        // Если книга одна
-                        else
-                            $biblionumber = $xpath->query('//*[@id="gbs-thumbnail-preview"]/@title')[0]->nodeValue;
+                            $booksCount = $xpath->query('//*[@name="biblionumber"]')->length;
 
-                        // Вывод карточки
-                        $bookInfo = getBookInfo('Деловая библиотека', $biblionumber);
-                        printBook($bookInfo);
+                            // Вывод карточек с информацией о книге и библиотеке
+                            for ($bookI = 0; $bookI < $booksCount; $bookI++) {
+                                $biblionumber = $xpath->query('//*[@name="biblionumber"]/@value')[$bookI]->nodeValue;
 
-                        $libraryInfo = getLibraryInfo('Деловая библиотека', $biblionumber);
-                        printLibrary($libraryInfo);
+                                // Вывод карточки
+                                $bookInfo = getBookInfo('Деловая библиотека', $biblionumber);
+                                printBook($bookInfo);
 
-                        printBookContainerEnd();
+                                $libraryInfo = getLibraryInfo('Деловая библиотека', $biblionumber);
+                                printLibrary($libraryInfo);
+
+                                printBookContainerEnd();
+                            }
+                        }
+                    }
+                    else {
+                        $booksCount = $xpath->query('//*[@name="biblionumber"]')->length;
+
+                        // Если книга одна в библиотеке
+                        if ($booksCount === 0)
+                            $booksCount += 1;
+
+                        // Вывод карточек с информацией о книге и библиотеке
+                        for ($bookI = 0; $bookI < $booksCount; $bookI++) {
+                            // Определение $biblionumber
+                            // Если книга не одна в библиотеке
+                            if ($booksCount > 1)
+                                $biblionumber = $xpath->query('//*[@name="biblionumber"]/@value')[$bookI]->nodeValue;
+                            // Если книга одна
+                            else
+                                $biblionumber = $xpath->query('//*[@id="gbs-thumbnail-preview"]/@title')[0]->nodeValue;
+
+                            // Вывод карточки
+                            $bookInfo = getBookInfo('Деловая библиотека', $biblionumber);
+                            printBook($bookInfo);
+
+                            $libraryInfo = getLibraryInfo('Деловая библиотека', $biblionumber);
+                            printLibrary($libraryInfo);
+
+                            printBookContainerEnd();
+                        }
                     }
                 }
                 // Ничего не найдено
