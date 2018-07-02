@@ -275,16 +275,15 @@ HERE;
                             if ($sameISBNBookIArray) {
                                 $wasPrinted = false;
                                 foreach ($sameISBNBookIArray as $bookIndex) {
-                                    if ($bookI == $bookIndex) {
+                                    if ($bookI == $bookIndex)
                                         $wasPrinted = true;
-                                    }
                                 }
                                 if ($wasPrinted)
                                     continue;
-                            } else {
-                                if (!isLibraryFit($xpathSKBM, $bookI)) {
+                            }
+                            else {
+                                if (!isLibraryFit($xpathSKBM, $bookI))
                                     continue;
-                                }
                             }
 
                             // Стягивание подробной информации о книге
@@ -300,42 +299,15 @@ HERE;
                             ]);
                             $htmlDetails = $responseDetails->getBody();
 
-                            // Получение каждого свойства книги
-                            $ISBN = getBookInfo($htmlDetails, 'ISBN');
+                            $bookInfo = getBookInfo('СКБМ', $htmlDetails);
 
-                            $title = getBookInfo($htmlDetails, 'title');
-                            
-                            $publisher = getBookInfo($htmlDetails, 'publisher');
                             /* Если книга без издателя — она не подходит по условиям проекта */
-                            if (!$publisher)
+                            if (!$bookInfo[publisher])
                                 continue;
 
-                            $year = getBookInfo($htmlDetails, 'year');
+                            if ($doNotShowFirstSKMBBook)
+                                printBook($bookInfo);
 
-                            $pages = getBookInfo($htmlDetails, 'pages');
-
-                            $author = getBookInfo($htmlDetails, 'author');
-
-                            if ($doNotShowFirstSKMBBook) {
-                                // Вывод описания книги
-                                echo <<<HERE
-                                        <div class="bookContainer">
-                                            <div class="row">
-                                                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-8">
-                                                    <div class="book">
-                                                        <div class="bookDesc">
-                                                            <h2>$titleTypografed</h2>
-                                                            <div class="details lead">
-                                                                <span class="author">$author</span>
-                                                                <span class="publisher">$publisher, $year</span>
-                                                                <span class="pages">$pages</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-HERE;
-                            }
                             $doNotShowFirstSKMBBook = 1;
 
                             printLibs($client, $xpathSKBM, $bookI);
@@ -364,32 +336,31 @@ HERE;
                                 $htmlDetails = $responseDetails->getBody();
 
 
-                                // Вытаскивание ISBN
-                                $ISBNNext = getBookInfo($htmlDetails, 'ISBN');
-                                if ($ISBN == $ISBNNext) {
+                                // Сравнение ISBN
+                                $bookNextInfo = getBookInfo('СКБМ', $htmlDetails);
+                                if ($bookInfo[ISBN] == $bookNextInfo[ISBN]) {
                                     printLibs($client, $xpathSKBM, $nextBookI);
                                     array_push($sameISBNBookIArray, $nextBookI);
-                                } else {
-                                    // Вытаскивание названия и издательства
-                                    $titleNext = getBookInfo($htmlDetails, 'title');
+                                }
+                                else {
+                                    // Сравнение названия и издательства
 
-                                    $publisherNext = getBookInfo($htmlDetails, 'publisher');
                                     /* Если книга без издателя — она не подходит по условиям проекта */
-                                    if (!$publisherNext)
+                                    if (!$bookNextInfo[publisher])
                                         continue;
 
-                                    if ($title == $titleNext && mb_strtolower($publisher) == mb_strtolower($publisherNext)) {
+                                    if ($bookInfo[title] == $bookNextInfo[title] && mb_strtolower($bookInfo[publisher]) == mb_strtolower($bookNextInfo[publisher])) {
                                         printLibs($client, $xpathSKBM, $nextBookI);
                                         array_push($sameISBNBookIArray, $nextBookI);
                                     }
                                 }
                             }
 
-                            echo '</div>';
+                            printBookContainerEnd();
                         }
                     }
                     else {
-                        echo '</div>';
+                        printBookContainerEnd();
                     }
                 }
                 else {
@@ -481,7 +452,6 @@ HERE;
                                 </div>
                             </div>
 HERE;
-
                     }
 
                     for ($bookI = 2; $bookI <= $bookCount; $bookI++) {
@@ -489,16 +459,15 @@ HERE;
                         if ($sameISBNBookIArray) {
                             $wasPrinted = false;
                             foreach ($sameISBNBookIArray as $bookIndex) {
-                                if ($bookI == $bookIndex) {
+                                if ($bookI == $bookIndex)
                                     $wasPrinted = true;
-                                }
                             }
                             if ($wasPrinted)
                                 continue;
-                        } else {
-                            if (!isLibraryFit($xpathSKBM, $bookI)) {
+                        }
+                        else {
+                            if (!isLibraryFit($xpathSKBM, $bookI))
                                 continue;
-                            }
                         }
 
                         // Стягивание подробной информации о книге
@@ -515,40 +484,13 @@ HERE;
                         $htmlDetails = $responseDetails->getBody();
 
                         // Получение каждого свойства книги
-                        $ISBN = getBookInfo($htmlDetails, 'ISBN');
+                        $bookInfo = getBookInfo('СКБМ', $htmlDetails);
 
-                        $title = getBookInfo($htmlDetails, 'title');
-                        $titleTypografed = typograf($title);
-
-                        $publisher = getBookInfo($htmlDetails, 'publisher');
                         /* Если книга без издателя — она не подходит по условиям проекта */
-                        if (!$publisher)
+                        if (!$bookInfo[publisher])
                             continue;
 
-                        $year = getBookInfo($htmlDetails, 'year');
-
-                        $pages = getBookInfo($htmlDetails, 'pages');
-
-                        $author = getBookInfo($htmlDetails, 'author');
-
-                        // Вывод описания книги
-                        echo <<<HERE
-                        <div class="bookContainer">
-                            <div class="row">
-                                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-8">
-                                    <div class="book">
-                                        <div class="bookDesc">
-                                            <h2>$titleTypografed</h2>
-                                            <div class="details lead">
-                                                <span class="author">$author</span>
-                                                <span class="publisher">$publisher, $year</span>
-                                                <span class="pages">$pages</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-HERE;
+                        printBook($bookInfo);
 
                         printLibs($client, $xpathSKBM, $bookI);
 
@@ -575,30 +517,27 @@ HERE;
                             ]);
                             $htmlDetails = $responseDetails->getBody();
 
-
-                            // Вытаскивание ISBN
-                            $ISBNNext = getBookInfo($htmlDetails, 'ISBN');
-                            if ($ISBN == $ISBNNext) {
+                            // Сравнение ISBN
+                            $bookNextInfo = getBookInfo('СКБМ', $htmlDetails);
+                            if ($bookInfo[ISBN] == $bookNextInfo[ISBN]) {
                                 printLibs($client, $xpathSKBM, $nextBookI);
                                 array_push($sameISBNBookIArray, $nextBookI);
                             }
                             else {
-                                // Вытаскивание названия и издательства
-                                $titleNext = getBookInfo($htmlDetails, 'title');
+                                // Сравнение названия и издательства
 
-                                $publisherNext = getBookInfo($htmlDetails, 'publisher');
                                 /* Если книга без издателя — она не подходит по условиям проекта */
-                                if (!$publisherNext)
+                                if (!$bookNextInfo[publisher])
                                     continue;
 
-                                if ($title == $titleNext && mb_strtolower($publisher) == mb_strtolower($publisherNext)) {
+                                if ($bookInfo[title] == $bookNextInfo[title] && mb_strtolower($bookInfo[publisher]) == mb_strtolower($bookNextInfo[publisher])) {
                                     printLibs($client, $xpathSKBM, $nextBookI);
                                     array_push($sameISBNBookIArray, $nextBookI);
                                 }
                             }
                         }
 
-                        echo '</div>';
+                        printBookContainerEnd();
                     }
                 }
             }

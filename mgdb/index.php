@@ -94,10 +94,10 @@ HERE;
                                 $biblionumber = $xpath->query('//*[@id="gbs-thumbnail-preview"]/@title')[0]->nodeValue;
 
                             // Вывод карточки
-                            $bookInfo = getBookInfo('Деловая библиотека', $biblionumber);
+                            $bookInfo = getBookInfo('ЦГДБ', $biblionumber);
                             printBook($bookInfo);
 
-                            $libraryInfo = getLibraryInfo('Деловая библиотека', $biblionumber);
+                            $libraryInfo = getLibraryInfo('ЦГДБ', $biblionumber);
                             printLibrary($libraryInfo);
 
                             printBookContainerEnd();
