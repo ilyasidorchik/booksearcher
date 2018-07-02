@@ -1,4 +1,25 @@
 <?php
+    function printInput($bookTitle) {
+        if (!$bookTitle)
+            $autofocus = 'autofocus';
+
+        echo <<<HERE
+            <main class="mt-5">
+                <div class="container">
+                    <div class="row">
+                         <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                             <div class="search-container">
+                                 <label for="search_inp"><h4>Поиск книг в библиотеках Москвы</h4></label>
+                                 <form action="" method="GET" class="form-inline search">
+                                     <input type="search" name="title" id="search_inp" class="form-control" placeholder="Название книги" value='$bookTitle' $autofocus>
+                                     <button class="btn btn-primary ml-2">Найти</button>
+                                 </form>
+                             </div>
+                         </div>
+                    </div>
+HERE;
+    }
+
     function getBookInfo($catalog, $source) {
         switch ($catalog) {
             case 'ЦГДБ':
@@ -287,7 +308,7 @@
                 return $library = [
                     "name" => "Деловая библиотека",
                     "address" => "м. ВДНХ, ул. Бориса Галушкина, 19к1",
-                    "timetable" => "http://mgdb.mos.ru/contacts/info/",
+                    "timetable" => "http://mgdb.mos.ru/",
                     "availability" => $libraryBooking
                 ];
         }
@@ -311,28 +332,10 @@
                     </div>
                 </div>
 HERE;
-
     }
 
-    function printLibrary($libraryInfo) {
-        echo <<<HERE
-            <div class="row">
-                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-8">
-                    <div class="library">
-                        <div class="libraryDesc">
-                            <div class="name">$libraryInfo[name]</div>
-                            <div class="details">
-                                <div class="address">$libraryInfo[address]</div>
-                                <div class="timetable">
-                                    <a class="timetable-item link" href="$libraryInfo[timetable]">Режим работы</a>
-                                </div>
-                            </div>
-                        </div>
-                        $libraryInfo[availability]
-                    </div>
-                </div>
-            </div>
-HERE;
+    function printBookContainerEnd() {
+        echo '</div>';
     }
 
     function isLibraryFit($xpathSKBM, $bookI) {
@@ -352,14 +355,12 @@ HERE;
                 // Счётчик количества входящих библиотек
                 $librarySystemContentI = $librarySystemI + 1;
                 $libraryCount = $xpathSKBM->query('//div[@id="searchrezult"]/div[@class="searchrez"]['.$bookI.']//div[@class="level"]['.$librarySystemContentI.']/div[@class="row"]')->length;
-                if ($libraryCount == 1) {
+                if ($libraryCount == 1)
                     $libraryName = $xpathSKBM->query('//div[@id="searchrezult"]/div[@class="searchrez"]['.$bookI.']//div[@class="level"]['.$librarySystemContentI.']/div[@class="row"][1]/div[@class="td loc"][1]//b')[0]->nodeValue;
-                }
             }
         }
-        if (strpos($libraryName, 'Детская') !== false || strpos($libraryName, 'детская') !== false || strpos($libraryName, 'читальня') !== false) {
+        if (strpos($libraryName, 'Детская') !== false || strpos($libraryName, 'детская') !== false || strpos($libraryName, 'читальня') !== false)
             return false;
-        }
         else
             return true;
     }
@@ -395,9 +396,8 @@ HERE;
 
     function printLib($libraryName, $libraryFullAddress, $libraryAuthID, $client) {
         // Отказ в печати библиотек, которые не выдают книги на дом взрослым
-        if (strpos($libraryName, 'Детская') !== false || strpos($libraryName, 'детская') !== false || strpos($libraryName, 'читальня') !== false) {
+        if (strpos($libraryName, 'Детская') !== false || strpos($libraryName, 'детская') !== false || strpos($libraryName, 'читальня') !== false)
             return false;
-        }
 
         // Сокращение названия библиотеки
         switch($libraryName) {
@@ -436,9 +436,7 @@ HERE;
             $libraryName = makeFirstLetterCapital($libraryName[1]);
         }
 
-        $remoteTypograf = new RemoteTypograf('UTF-8');
-        $libraryNameTypografed = $remoteTypograf->processText($libraryName);
-        $libraryNameTypografed = strip_tags($libraryNameTypografed);
+        $libraryNameTypografed = typograf($libraryName);
 
         $libraryAddress = findAddressWithMetro($libraryFullAddress);
 
@@ -451,46 +449,35 @@ HERE;
                 'querylist' => '<_service>STORAGE:opacafd:View[separator]<_version>1.3.0[separator]<session>27510[separator]<iddb>100[separator]<id>'.$libraryAuthID.'[separator]<length>15[separator]<$length>15[separator]<$start>1[separator]<mode>OUTRECORD[separator]<outforms[0]>BLK856[separator]<outforms[1]>TITLE[separator]<outforms[2]>ADDRESS[separator]<outforms[3]>BLK305[separator]<outforms[4]>BLK300[separator]<outforms[5]>BLOCK310[separator]<outforms[6]>BLOCK320[separator]<outforms[7]>BLOCK330[separator]<outforms[8]>BLOCK340[separator]<outforms[9]>BLOCK4[separator]<outforms[10]>BLOCK5[separator]<outforms[11]>BLOCK7[separator]<userId>ADMIN[separator]<$basequant>2392771[separator]<$flag45>yes'
             ]
         ]);
-        $libraryInfo = $responseLibraryInfo->getBody();
-        preg_match('/text: "Интернет-сайт\[END\](.*?)"/', $libraryInfo, $matches);
+        $libraryTimetable = $responseLibraryInfo->getBody();
+        preg_match('/text: "Интернет-сайт\[END\](.*?)"/', $libraryTimetable, $matches);
         $libraryTimetable = $matches[1];
-
-
-        $library = [
-            "name" => "<a href='$libraryTimetable' class='static'>$libraryNameTypografed</a>",
-            "address" => $libraryAddress
+        
+        $libraryInfo = [
+            "name" => $libraryNameTypografed,
+            "address" => $libraryAddress,
+            "timetable" => $libraryTimetable
         ];
 
-        echo <<<HERE
-                                                    <div class="row">
-                                                        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-8">
-                                                            <div class="library">
-                                                                <div class="libraryDesc">
-                                                                    <div class="name"><b>$library[name]</b></div>
-                                                                    <div class="details">
-                                                                        <div class="address">$library[address]</div>
-                                                                        <!--
-                                                                        <div class="timetable">
-                                                                            span class="timetable-item today">Сегодня до 22</span>
-                                                                            <a href="" class="timetable-item link">Режим работы</a>
-                                                                        </div>
-                                                                        -->
-                                                                    </div>
-                                                                </div>
-                                                                <div class="libraryBooking">
-                                                                    <!--<input type="submit" name="to-book" class="btn btn-outline-dark btn-sm" value="Забронировать">
-                                                                    <div class="status small">
-                                                                        
-                                                                    </div>-->
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-HERE;
+        printLibrary($libraryInfo);
     }
 
-    function printBookContainerEnd() {
-        echo '</div>';
+    function printLibrary($libraryInfo) {
+        echo <<<HERE
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-8">
+                    <div class="library">
+                        <div class="libraryDesc">
+                            <div class="name"><a href='$libraryInfo[timetable]' class='static'>$libraryInfo[name]</a></div>
+                            <div class="details">
+                                <div class="address">$libraryInfo[address]</div>
+                            </div>
+                        </div>
+                        $libraryInfo[availability]
+                    </div>
+                </div>
+            </div>
+HERE;
     }
 
     function findAddressWithMetro($libraryFullAddress) {
@@ -589,12 +576,6 @@ HERE;
     function typograf($str) {
         $remoteTypograf = new RemoteTypograf('UTF-8');
         $strTypografed = $remoteTypograf->processText($str);
-        $strTypografed = strip_tags($strTypografed);
-        $strTypografed = substr($strTypografed, 0, -1);
-        return $strTypografed;
-    }
-
-    function clearFromTypograf($strTypografed) {
         $strTypografed = strip_tags($strTypografed);
         $strTypografed = substr($strTypografed, 0, -1);
         return $strTypografed;
