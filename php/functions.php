@@ -482,13 +482,12 @@ HERE;
 
     function findAddressWithMetro($libraryFullAddress) {
         // Для библиотек-одиночек нет адреса
-        if ($libraryFullAddress == 'Россия, Москва') {
+        if ($libraryFullAddress == 'Россия, Москва')
             return;
-        }
+
         // Если адрес уже с метро — оставляем
-        if (strpos($libraryFullAddress, 'м. ') === 0) {
+        if (strpos($libraryFullAddress, 'м. ') === 0)
             return $libraryFullAddress;
-        }
 
         // Стирание страны, индекса, города в адресе
         if(strpos($libraryFullAddress, 'Москва')) {
@@ -496,14 +495,12 @@ HERE;
             $address = explode('Москва, ', $libraryFullAddress);
             $address = $address[1];
         }
-        else {
+        else
             $address = substr($libraryFullAddress, 21);
-        }
 
         // Ставим недостающие пробелы: вместо «ул.Пушкина, дом.1» — «ул. Пушкина, д. 1»
-        if(strpos($libraryFullAddress, '. ') == false) {
+        if(strpos($libraryFullAddress, '. ') == false)
             $address = str_replace('.', '. ', $address);
-        }
 
         $metro = findMetro($address);
 
