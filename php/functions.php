@@ -20,6 +20,20 @@
 HERE;
     }
 
+    function getHtmlWithBookDetails_SKBM($client, $xpath_SKBM, $bookI_SKBM) {
+        $bookID_SKBM = $xpath_SKBM->query('//div[@id="searchrezult"]/div[@class="searchrez"][' . $bookI_SKBM . ']/@id')[0]->nodeValue;
+        $bookID_SKBM = str_replace('\\\\\\\\', '\\', $bookID_SKBM);
+        $responseWithBookDetails_SKBM = $client->request('POST', 'http://skbm.nekrasovka.ru/request', [
+            'form_params' => [
+                '_action' => 'execute',
+                '_html' => 'stat',
+                '_errorhtml' => 'error',
+                'querylist' => '<_service>STORAGE:opacfindd:FindView[separator]<_version>2.3.0[separator]<session>26210[separator]<iddbIds[0]/id>' . $bookID_SKBM . '[separator]<iddbIds[0]/iddb>1[separator]<outform>FULLFORM[separator]<_history>yes[separator]<$iddb>1[separator]<userId>ADMIN[separator]<$basequant>2391872[separator]<$flag45>yes'
+            ]
+        ]);
+        return $responseWithBookDetails_SKBM->getBody();
+    }
+
     function getBookInfo($catalog, $source) {
         switch ($catalog) {
             case 'ЦГДБ':
@@ -147,94 +161,12 @@ HERE;
         return $bookInfo;
     }
 
-    /*function getBookInfo($library, $infoType, $source) {
-        switch ($library) {
-            case 'ЦГДБ':
-                $author1Dirty = $source->query("//tr[td='Часть имени, кроме начального элемента ввода']/td[2]")[0]->nodeValue;
-                $author2Dirty = $source->query("//tr[td='Начальный элемент ввода']/td[2]")[0]->nodeValue;
-                $author1Dirty1 = str_replace(' ', '', $author1Dirty);
-                $authorMGDB = str_replace('.', '. ', $author1Dirty1) . $author2Dirty;
-                return $authorMGDB;
-            default:
-                switch ($infoType) {
-                    case 'ISBN':
-                        preg_match('/<ISBN:>\s+([\d-]+)/', $source, $matches);
-                        $ISBN = preg_replace("/[^0-9]/", '', $matches[1]);
-                        return $ISBN;
-                    case 'title':
-                        preg_match('/к заглавию:> (.*)",\n"<Ответственность/', $source, $matches);
-                        $title2 = $matches[1];
-                        if ($title2) {
-                            preg_match('/<Основное заглавие:> (.*?)"/', $source, $matches);
-                            $title1 = $matches[1];
-                            if (strpos($title2, '[') === 0)
-                                $title2 = null;
-                            else {
-                                $title2 = str_replace('\\', '', $title2);
-                                $title2 = '. ' . makeFirstLetterCapital($title2);
-                            }
-                        }
-                        else {
-                            preg_match('/заглавие:> (.*)"/', $source, $matches);
-                            $title1 = $matches[1];
-                            $title1 = str_replace('\\', '', $title1);
-                        }
-                        $title = $title1 . $title2;
-                        $title = str_replace('!.', '!', $title);
-                        return $title;
-                    case 'publisher':
-                        preg_match('/<Издательство:> (.*?)\[\/i]"/', $source, $matches);
-                        $publisher = $matches[1];
-                        $publisher = str_replace(['[i class=PU]', '[/i]'], '', $publisher);
-                        $publisher = str_replace('\\"', '', $publisher);
-                        $publisher = str_replace('ООО ', '', $publisher);
-                        if ($publisher == 'Э' || $publisher == 'ЭКСМО')
-                            $publisher = 'Эксмо';
-                        if ($publisher == 'Альпина Паблишерз')
-                            $publisher = 'Альпина Паблишер';
-                        return $publisher;
-                    case 'year':
-                        preg_match('/<Дата издания:> (.*?)"/', $source, $matches);
-                        return $matches[1];
-                    case 'pages':
-                        preg_match('/<Объем:> (.*?)"/', $source, $matches);
-                        $pagesOriginally = $matches[1];
-                        $pos = strpos($pagesOriginally, ',');
-                        if($pos) {
-                            $pages = '';
-                            for ($i = 0; $i < $pos; $i++) {
-                                $pages .= $pagesOriginally[$i];
-                            }
-                            $pages = preg_replace("/[^0-9]/", '', $pages);
-                        }
-                        else {
-                            $pages = preg_replace("/[^0-9]/", '', $pagesOriginally);
-                        }
-                        $pages .= ' стр.';
-                        return $pages;
-                    case 'author':
-                        preg_match('/<Ответственность:> (.*?)"/', $source, $matches);
-                        if($matches[1]) {
-                            $author = $matches[1];
-                            // Если начинается с квадратной скобки или содержит переводчика — назначаем автора из Автора
-                            if (strpos($author, '[') === 0 || strpos($author, 'пер.') === 0) {
-                                preg_match('/<Автор:> ?(.*?)"/', $source, $matches);
-                                $author  = str_replace(['[i class=RP]', '[/i]'], '', $matches[1]);
-                            }
-                        }
-                        else {
-                            preg_match('/<Автор:> ?(.*?)"/', $source, $matches);
-                            $author  = str_replace(['[i class=RP]', '[/i]'], '', $matches[1]);
-                        }
-                        if (substr_count($author, ' ') <= 2) {
-                            // Вместо «Сидорчик, Илья» — «Илья Сидорчик»
-                            $author = explode(', ', $author);
-                            $author = $author[1] . ' ' . $author[0];
-                        }
-                        return $author;
-                }
-        }
-    }*/
+    function areBooksSame($bookInfo1, $bookInfo2) {
+        if (($bookInfo1[ISBN] == $bookInfo2[ISBN]) || ($bookInfo1[title] == $bookInfo2[title] && mb_strtolower($bookInfo1[publisher]) == mb_strtolower($bookInfo2[publisher])))
+            return true;
+        else
+            return false;
+    }
 
     function getLibraryInfo($library, $source) {
         switch ($library) {

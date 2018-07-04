@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="ru">
     <head>
         <meta charset="utf-8">
@@ -101,84 +100,56 @@
                                 printBookContainerEnd();
                             else {
                                 for ($bookI_SKBM = 2; $bookI_SKBM <= $booksCount_SKBM; $bookI_SKBM++) {
-                                    // В массиве $sameISBNBookIArray_SKBM хранятся индексы книг, которые уже напечатаны и которые есть в библиотеке, единственной и не подходящей по условиям проекта
-                                    if ($sameISBNBookIArray_SKBM) {
-                                        $wasPrinted = false;
-                                        foreach ($sameISBNBookIArray_SKBM as $bookIndex) {
-                                            if ($bookI_SKBM == $bookIndex)
-                                                $wasPrinted = true;
-                                        }
-                                        if ($wasPrinted)
+                                    // В массиве $sameISBNBookIArray_SKBM хранятся индексы книг, которые уже напечатаны, не имеют автора автора и которые есть в библиотеках, не подходящих по условиям проекта
+                                    if ($arrayOfWasteBookI_SKBM) {
+                                        if (in_array($bookI_SKBM, $arrayOfWasteBookI_SKBM))
                                             continue;
                                     }
-                                    else {
-                                        if (!isLibraryFit($xpath_SKBM, $bookI_SKBM))
-                                            continue;
+                                    else
+                                        $arrayOfWasteBookI_SKBM = array();
+
+                                    if (!isLibraryFit($xpath_SKBM, $bookI_SKBM)) {
+                                        array_push($arrayOfWasteBookI_SKBM, $bookI_SKBM);
+                                        continue;
                                     }
 
-                                    // Стягивание подробной информации о книге
-                                    $bookID_SKBM = $xpath_SKBM->query('//div[@id="searchrezult"]/div[@class="searchrez"][' . $bookI_SKBM . ']/@id')[0]->nodeValue;
-                                    $bookID_SKBM = str_replace('\\\\\\\\', '\\', $bookID_SKBM);
-                                    $responseWithBookDetails_SKBM = $client->request('POST', 'http://skbm.nekrasovka.ru/request', [
-                                        'form_params' => [
-                                            '_action' => 'execute',
-                                            '_html' => 'stat',
-                                            '_errorhtml' => 'error',
-                                            'querylist' => '<_service>STORAGE:opacfindd:FindView[separator]<_version>2.3.0[separator]<session>26210[separator]<iddbIds[0]/id>' . $bookID_SKBM . '[separator]<iddbIds[0]/iddb>1[separator]<outform>FULLFORM[separator]<_history>yes[separator]<$iddb>1[separator]<userId>ADMIN[separator]<$basequant>2391872[separator]<$flag45>yes'
-                                        ]
-                                    ]);
-                                    $htmlWithBookDetails_SKBM = $responseWithBookDetails_SKBM->getBody();
 
+                                    $htmlWithBookDetails_SKBM = getHtmlWithBookDetails_SKBM($client, $xpath_SKBM, $bookI_SKBM);
                                     $bookInfo_SKBM = getBookInfo('СКБМ', $htmlWithBookDetails_SKBM);
 
-                                    /* Если книга без издателя — она не подходит по условиям проекта */
-                                    if (!$bookInfo_SKBM[publisher])
-                                        array_push($sameISBNBookIArray_SKBM, $bookI_SKBM);
+                                    // Если книга без издателя — она не подходит по условиям проекта
+                                    if (!$bookInfo_SKBM[publisher]) {
+                                        array_push($arrayOfWasteBookI_SKBM, $bookI_SKBM);
+                                        continue;
+                                    }
 
 
+                                    // Проверка на совпадение. Сравнение ISBN или названия и издательства
+                                    if (areBooksSame($bookInfo_MGDB, $bookInfo_SKBM)) {
+                                        array_push($arrayOfWasteBookI_SKBM, $bookI_SKBM);
+                                        printLibs($client, $xpath_SKBM, $bookI_SKBM);
 
-                                    printLibs($client, $xpath_SKBM, $bookI_SKBM);
-
-                                    // Вывод библиотек, в которых есть книга с $bookI_SKBM, и запись их индексов в массив, чтобы не выводить ещё раз
-                                    $nextBookIAfterCurrent_SKBM = $bookI_SKBM + 1;
-                                    if (!$sameISBNBookIArray_SKBM)
-                                        $sameISBNBookIArray_SKBM = array();
-                                    for ($nextBookI_SKBM = $nextBookIAfterCurrent_SKBM; $nextBookI_SKBM <= $booksCount_SKBM; $nextBookI_SKBM++) {
-                                        if (!isLibraryFit($xpath_SKBM, $nextBookI_SKBM)) {
-                                            array_push($sameISBNBookIArray_SKBM, $nextBookI_SKBM);
-                                            continue;
-                                        }
-
-                                        // Стягивание подробной информации о книге
-                                        $bookID_SKBM = $xpath_SKBM->query('//div[@id="searchrezult"]/div[@class="searchrez"][' . $nextBookI_SKBM . ']/@id')[0]->nodeValue;
-                                        $bookID_SKBM = str_replace('\\\\\\\\', '\\', $bookID_SKBM);
-                                        $responseWithBookDetails_SKBM = $client->request('POST', 'http://skbm.nekrasovka.ru/request', [
-                                            'form_params' => [
-                                                '_action' => 'execute',
-                                                '_html' => 'stat',
-                                                '_errorhtml' => 'error',
-                                                'querylist' => '<_service>STORAGE:opacfindd:FindView[separator]<_version>2.3.0[separator]<session>26210[separator]<iddbIds[0]/id>' . $bookID_SKBM . '[separator]<iddbIds[0]/iddb>1[separator]<outform>FULLFORM[separator]<_history>yes[separator]<$iddb>1[separator]<userId>ADMIN[separator]<$basequant>2391872[separator]<$flag45>yes'
-                                            ]
-                                        ]);
-                                        $htmlWithBookDetails_SKBM = $responseWithBookDetails_SKBM->getBody();
-
-                                        // Проверка на совпадение
-                                        // Сравнение ISBN
-                                        $bookNextInfo_SKBM = getBookInfo('СКБМ', $htmlWithBookDetails_SKBM);
-                                        if ($bookInfo_SKBM[ISBN] == $bookNextInfo_SKBM[ISBN]) {
-                                            printLibs($client, $xpath_SKBM, $nextBookI_SKBM);
-                                            array_push($sameISBNBookIArray_SKBM, $nextBookI_SKBM);
-                                        }
-                                        else {
-                                            // Сравнение названия и издательства
-
-                                            /* Если книга без издателя — она не подходит по условиям проекта */
-                                            if (!$bookNextInfo_SKBM[publisher])
+                                        // Вывод библиотек, в которых есть книга с $bookI_SKBM, и запись их индексов в массив, чтобы не выводить ещё раз
+                                        $nextBookIAfterCurrent_SKBM = $bookI_SKBM + 1;
+                                        for ($nextBookI_SKBM = $nextBookIAfterCurrent_SKBM; $nextBookI_SKBM <= $booksCount_SKBM; $nextBookI_SKBM++) {
+                                            if (!isLibraryFit($xpath_SKBM, $nextBookI_SKBM)) {
+                                                array_push($arrayOfWasteBookI_SKBM, $nextBookI_SKBM);
                                                 continue;
+                                            }
 
-                                            if ($bookInfo_SKBM[title] == $bookNextInfo_SKBM[title] && mb_strtolower($bookInfo_SKBM[publisher]) == mb_strtolower($bookNextInfo_SKBM[publisher])) {
+                                            $htmlWithBookDetails_SKBM = getHtmlWithBookDetails_SKBM($client, $xpath_SKBM, $nextBookI_SKBM);
+                                            $bookNextInfo_SKBM = getBookInfo('СКБМ', $htmlWithBookDetails_SKBM);
+
+                                            // Если книга без издателя — она не подходит по условиям проекта
+                                            if (!$bookNextInfo_SKBM[publisher]) {
+                                                array_push($arrayOfWasteBookI_SKBM, $nextBookI_SKBM);
+                                                continue;
+                                            }
+
+                                            // Проверка на совпадение. Сравнение ISBN или названия и издательства
+                                            if (areBooksSame($bookInfo_SKBM, $bookNextInfo_SKBM)) {
+                                                array_push($arrayOfWasteBookI_SKBM, $nextBookI_SKBM);
                                                 printLibs($client, $xpath_SKBM, $nextBookI_SKBM);
-                                                array_push($sameISBNBookIArray_SKBM, $nextBookI_SKBM);
                                             }
                                         }
                                     }
@@ -189,6 +160,8 @@
                         }
                     }
                 }
+
+                // здесь вывод из СКБМ оставшихся
             }
         ?>
             </div>
