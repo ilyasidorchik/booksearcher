@@ -1,5 +1,5 @@
 <?php
-    
+
 ?>
 <html lang="ru">
     <head>
@@ -87,7 +87,6 @@
                             // Библиотеки СКБМ
                             $arrayOfWasteBookI_SKBM = printBooksAndLibs_SKBM($booksCount_SKBM, $xpath_SKBM, $client, $arrayOfWasteBookI_SKBM, $bookInfo_MGDB, 'checkOnSameWithBookMGDB');
 
-
                             printBookContainerEnd();
                         }
                     }
@@ -95,7 +94,7 @@
 
                 // Вывод оставшихся карточек
                 // СКБМ
-                printBooksAndLibs_SKBM($booksCount_SKBM, $xpath_SKBM, $client, $arrayOfWasteBookI_SKBM, $bookInfo_MGDB, 'notCheckOnSameWithBookMGDB');
+                $arrayOfWasteBookI_SKBM = printBooksAndLibs_SKBM($booksCount_SKBM, $xpath_SKBM, $client, $arrayOfWasteBookI_SKBM, $bookInfo_MGDB, 'notCheckOnSameWithBookMGDB');
             }
         ?>
             </div>

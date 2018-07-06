@@ -95,17 +95,16 @@ HERE;
                 $ISBN = preg_replace("/[^0-9]/", '', $matches[1]);
 
                 // Название
-                preg_match('/к заглавию:> (.*)",\n"<Ответственность/', $source, $matches);
+                preg_match('/к заглавию:> (.*)",\n"/', $source, $matches);
                 $title2 = $matches[1];
                 if ($title2) {
-                    preg_match('/<Основное заглавие:> (.*?)"/', $source, $matches);
+                    preg_match('/<Основное заглавие:> (.*?)",\n"/', $source, $matches);
                     $title1 = $matches[1];
+
                     if (strpos($title2, '[') === 0)
                         $title2 = null;
-                    else {
-                        $title2 = str_replace('\\', '', $title2);
+                    else
                         $title2 = '. ' . makeFirstLetterCapital($title2);
-                    }
                 }
                 else {
                     preg_match('/заглавие:> (.*)"/', $source, $matches);
@@ -113,7 +112,7 @@ HERE;
                     $title1 = str_replace('\\', '', $title1);
                 }
                 $title = $title1 . $title2;
-                $title = str_replace('!.', '!', $title);
+                $title = str_replace('\\', '', $title);
                 $titleTypografed = typograf($title);
 
                 // Автор
@@ -268,7 +267,7 @@ HERE;
                 if (in_array($bookI_SKBM, $arrayOfWasteBookI_SKBM))
                     continue;
             }
-            else
+            elseif (!is_array($arrayOfWasteBookI_SKBM))
                 $arrayOfWasteBookI_SKBM = array();
 
             if (!isLibraryFit($xpath_SKBM, $bookI_SKBM)) {
@@ -276,17 +275,24 @@ HERE;
                 continue;
             }
 
-
             $htmlWithBookDetails_SKBM = getHtmlWithBookDetails_SKBM($client, $xpath_SKBM, $bookI_SKBM);
             $bookInfo_SKBM = getBookInfo('СКБМ', $htmlWithBookDetails_SKBM);
 
+            // Если книга без издателя — она не подходит по условиям проекта
+            if (!$bookInfo_SKBM[publisher]) {
+                array_push($arrayOfWasteBookI_SKBM, $bookI_SKBM);
+                continue;
+            }
+
             if ($isCheckOnSame == 'checkOnSameWithBookMGDB')
                 $arrayOfWasteBookI_SKBM = printAllLibsWithSameBook_SKBM($bookInfo_MGDB, $bookInfo_SKBM, $bookI_SKBM, $client, $xpath_SKBM, $booksCount_SKBM, $arrayOfWasteBookI_SKBM);
-            else
+            else {
                 $arrayOfWasteBookI_SKBM = printAllLibs_SKBM($bookInfo_SKBM, $bookI_SKBM, $client, $xpath_SKBM, $booksCount_SKBM, $arrayOfWasteBookI_SKBM);
-
-            return $arrayOfWasteBookI_SKBM;
+                printBookContainerEnd();
+            }
         }
+
+        return $arrayOfWasteBookI_SKBM;
     }
 
     function printAllLibsWithSameBook_SKBM($bookInfo_MGDB, $bookInfo_SKBM, $bookI_SKBM, $client, $xpath_SKBM, $booksCount_SKBM, $arrayOfWasteBookI_SKBM) {
@@ -304,6 +310,12 @@ HERE;
 
                 $htmlWithBookDetails_SKBM = getHtmlWithBookDetails_SKBM($client, $xpath_SKBM, $nextBookI_SKBM);
                 $bookNextInfo_SKBM = getBookInfo('СКБМ', $htmlWithBookDetails_SKBM);
+
+                // Если книга без издателя — она не подходит по условиям проекта
+                if (!$bookInfo_SKBM[publisher]) {
+                    array_push($arrayOfWasteBookI_SKBM, $bookI_SKBM);
+                    continue;
+                }
 
                 // Проверка на совпадение. Сравнение ISBN или названия и издательства
                 if (areBooksSame($bookInfo_SKBM, $bookNextInfo_SKBM)) {
@@ -332,6 +344,12 @@ HERE;
 
             $htmlWithBookDetails_SKBM = getHtmlWithBookDetails_SKBM($client, $xpath_SKBM, $nextBookI_SKBM);
             $bookNextInfo_SKBM = getBookInfo('СКБМ', $htmlWithBookDetails_SKBM);
+
+            // Если книга без издателя — она не подходит по условиям проекта
+            if (!$bookInfo_SKBM[publisher]) {
+                array_push($arrayOfWasteBookI_SKBM, $bookI_SKBM);
+                continue;
+            }
 
             // Проверка на совпадение. Сравнение ISBN или названия и издательства
             if (areBooksSame($bookInfo_SKBM, $bookNextInfo_SKBM)) {
