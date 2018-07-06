@@ -7,8 +7,8 @@
             <main class="mt-5">
                 <div class="container">
                     <div class="row">
-                         <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
-                             <div class="search-container">
+                         <div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
+                             <div class="searchСontainer">
                                  <label for="search_inp"><h4>Поиск книг в библиотеках Москвы</h4></label>
                                  <form action="" method="GET" class="form-inline search">
                                      <input type="search" name="title" id="search_inp" class="form-control" placeholder="Название книги" value='$bookTitle' $autofocus>
@@ -183,13 +183,6 @@ HERE;
         return $bookInfo;
     }
 
-    function areBooksSame($bookInfo1, $bookInfo2) {
-        if (($bookInfo1[ISBN] == $bookInfo2[ISBN]) || ($bookInfo1[title] == $bookInfo2[title] && mb_strtolower($bookInfo1[publisher]) == mb_strtolower($bookInfo2[publisher])))
-            return true;
-        else
-            return false;
-    }
-
     function getLibraryInfo($library, $source) {
         switch ($library) {
             case 'ЦГДБ':
@@ -287,16 +280,10 @@ HERE;
             $htmlWithBookDetails_SKBM = getHtmlWithBookDetails_SKBM($client, $xpath_SKBM, $bookI_SKBM);
             $bookInfo_SKBM = getBookInfo('СКБМ', $htmlWithBookDetails_SKBM);
 
-            // Если книга без издателя — она не подходит по условиям проекта
-            if (!$bookInfo_SKBM[publisher]) {
-                array_push($arrayOfWasteBookI_SKBM, $bookI_SKBM);
-                continue;
-            }
-
             if ($isCheckOnSame == 'checkOnSameWithBookMGDB')
                 $arrayOfWasteBookI_SKBM = printAllLibsWithSameBook_SKBM($bookInfo_MGDB, $bookInfo_SKBM, $bookI_SKBM, $client, $xpath_SKBM, $booksCount_SKBM, $arrayOfWasteBookI_SKBM);
             else
-                $arrayOfWasteBookI_SKBM = printAllLibs_SKBM($bookInfo_MGDB, $bookInfo_SKBM, $bookI_SKBM, $client, $xpath_SKBM, $booksCount_SKBM, $arrayOfWasteBookI_SKBM);
+                $arrayOfWasteBookI_SKBM = printAllLibs_SKBM($bookInfo_SKBM, $bookI_SKBM, $client, $xpath_SKBM, $booksCount_SKBM, $arrayOfWasteBookI_SKBM);
 
             return $arrayOfWasteBookI_SKBM;
         }
@@ -318,12 +305,6 @@ HERE;
                 $htmlWithBookDetails_SKBM = getHtmlWithBookDetails_SKBM($client, $xpath_SKBM, $nextBookI_SKBM);
                 $bookNextInfo_SKBM = getBookInfo('СКБМ', $htmlWithBookDetails_SKBM);
 
-                // Если книга без издателя — она не подходит по условиям проекта
-                if (!$bookNextInfo_SKBM[publisher]) {
-                    array_push($arrayOfWasteBookI_SKBM, $nextBookI_SKBM);
-                    continue;
-                }
-
                 // Проверка на совпадение. Сравнение ISBN или названия и издательства
                 if (areBooksSame($bookInfo_SKBM, $bookNextInfo_SKBM)) {
                     array_push($arrayOfWasteBookI_SKBM, $nextBookI_SKBM);
@@ -335,7 +316,7 @@ HERE;
         return $arrayOfWasteBookI_SKBM;
     }
 
-    function printAllLibs_SKBM($bookInfo_MGDB, $bookInfo_SKBM, $bookI_SKBM, $client, $xpath_SKBM, $booksCount_SKBM, $arrayOfWasteBookI_SKBM) {
+    function printAllLibs_SKBM($bookInfo_SKBM, $bookI_SKBM, $client, $xpath_SKBM, $booksCount_SKBM, $arrayOfWasteBookI_SKBM) {
         printBook($bookInfo_SKBM);
 
         array_push($arrayOfWasteBookI_SKBM, $bookI_SKBM);
@@ -352,12 +333,6 @@ HERE;
             $htmlWithBookDetails_SKBM = getHtmlWithBookDetails_SKBM($client, $xpath_SKBM, $nextBookI_SKBM);
             $bookNextInfo_SKBM = getBookInfo('СКБМ', $htmlWithBookDetails_SKBM);
 
-            // Если книга без издателя — она не подходит по условиям проекта
-            if (!$bookNextInfo_SKBM[publisher]) {
-                array_push($arrayOfWasteBookI_SKBM, $nextBookI_SKBM);
-                continue;
-            }
-
             // Проверка на совпадение. Сравнение ISBN или названия и издательства
             if (areBooksSame($bookInfo_SKBM, $bookNextInfo_SKBM)) {
                 array_push($arrayOfWasteBookI_SKBM, $nextBookI_SKBM);
@@ -368,11 +343,18 @@ HERE;
         return $arrayOfWasteBookI_SKBM;
     }
 
+    function areBooksSame($bookInfo1, $bookInfo2) {
+        if (($bookInfo1[ISBN] == $bookInfo2[ISBN]) || ($bookInfo1[title] == $bookInfo2[title] && mb_strtolower($bookInfo1[publisher]) == mb_strtolower($bookInfo2[publisher])))
+            return true;
+        else
+            return false;
+    }
+
     function printBook($bookInfo) {
         echo <<<HERE
             <div class="bookContainer">
                 <div class="row">
-                    <div class="col-sm-12 col-md-12 col-lg-12 col-xl-8">
+                    <div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
                         <div class="book">
                             <div class="bookDesc">
                                  <h2>$bookInfo[titleTypografed]</h2>
@@ -506,6 +488,9 @@ HERE;
         $libraryTimetable = $responseLibraryInfo->getBody();
         preg_match('/text: "Интернет-сайт\[END\](.*?)"/', $libraryTimetable, $matches);
         $libraryTimetable = $matches[1];
+
+        if (!$libraryAddress)
+            $libraryAddress = '&nbsp;';
         
         $libraryInfo = [
             "name" => $libraryNameTypografed,
@@ -519,7 +504,7 @@ HERE;
     function printLibrary($libraryInfo) {
         echo <<<HERE
             <div class="row">
-                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-8">
+                <div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
                     <div class="library">
                         <div class="libraryDesc">
                             <div class="name"><a href='$libraryInfo[timetable]' class='static'>$libraryInfo[name]</a></div>

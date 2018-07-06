@@ -4,7 +4,7 @@ body {
     background: #f8f8f8;
 }
 
-//Стандартные
+// Стандартные
 .static {
     color: #000;
     border-bottom: 1px solid rgba(0, 0, 0, .25);
@@ -123,15 +123,17 @@ nav {
     }
 }
 
-.search-container {
+.searchСontainer {
     margin-bottom: 50px;
     h4 {
         margin-bottom: .5rem;
     }
 
     form.search {
+        flex-wrap: nowrap;
+
         input[type="search"] {
-            width: 50%;
+            flex-grow: 1;
             background: #f8f8f8;
             transition: background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 
@@ -142,15 +144,15 @@ nav {
     }
 }
 
-@media (max-width: 992px) {
+/*@media (max-width: 992px) {
     .search-container {
         form.search {
             input[type="search"] {
-                width: 70%;
+
             }
         }
     }
-}
+}*/
 
 .bookContainer {
     margin-bottom: 40px;
@@ -320,13 +322,5 @@ nav {
 }
 
 @media (max-width: 438px) {
-    .bookContainer .row .library .libraryDesc {
-        width: 100%;
-    }
-
-    .bookContainer .row .library .libraryBooking {
-        clear: left;
-        padding: 0;
-        margin-top: 20px;
-    }
+    flex-wrap: wrap;
 }
