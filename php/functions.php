@@ -28,7 +28,7 @@ HERE;
                 '_action' => 'php',
                 '_errorhtml' => 'error1',
                 '_handler' => 'search/search.php',
-                'querylist' => '<_service>STORAGE:opacfindd:FindView[separator]<_version>2.5.0[separator]<session>26026[separator]<_start>0[separator]<start>0[separator]<$length>15[separator]<length>15[separator]<iddb>1[separator]<_showstr><i>Заглавие</i> ' . $bookTitle . '[separator]<_str>[bracket]TITL ' . $bookTitle . '[/bracket][separator]<$outform>SHORTFM[separator]<outformList[0]/outform>SHORTFM[separator]<outformList[1]/outform>LINEORD[separator]<outformList[2]/outform>SHORTFMS[separator]<outformList[3]/outform>SHORTFMSTR[separator]<$filterstr>[bracket][bracket]LRES [apos]ТЕКСТЫ[apos][/bracket][/bracket] AND [bracket]LPUB [apos]КНИГИ[apos][/bracket][separator]<$filtersids>filter_1_2_0[END]filter_1_3_0[separator]<$fshowstr><i>вид документа</i> тексты И <i>вид издания</i> книги[separator]<query/body>(TITL ' . $bookTitle . ') AND ((LRES \'ТЕКСТЫ\')) AND (LPUB \'КНИГИ\')[separator]<_history>yes[separator]<userId>ADMIN[separator]<$linkstring>043[ID]Заказ документа[END]044[ID]Заказ копии документа[END][separator]<level[0]>Full[separator]<level[1]>Retro[separator]<level[2]>Unfinished[separator]<level[3]>Identify[separator]<$swfterm>[bracket]TITL ' . $bookTitle . '[/bracket] AND [bracket][bracket]LRES [apos]ТЕКСТЫ[apos][/bracket][/bracket] AND [bracket]LPUB [apos]КНИГИ[apos][/bracket][separator]<_iddb>1[separator]<$addfilters>[NEXT]filter_1_1_else[IND]fixed_1_0_1525854941893[CLASS](LFR \'печатная/рукописная\')[TEXT]печатная/рукописная[separator]<$typework>search[separator]<$basequant>2391872[separator]<$flag45>yes',
+                'querylist' => '<_service>STORAGE:opacfindd:FindView[separator]<_version>2.5.0[separator]<session>31926[separator]<_start>0[separator]<start>0[separator]<$length>15[separator]<length>15[separator]<iddb>1[separator]<_showstr><i>Везде</i> ' . $bookTitle . '[separator]<_str>[bracket]AH ' . $bookTitle . '[/bracket][separator]<$outform>SHORTFM[separator]<outformList[0]/outform>SHORTFM[separator]<outformList[1]/outform>LINEORD[separator]<outformList[2]/outform>SHORTFMS[separator]<outformList[3]/outform>SHORTFMSTR[separator]<$filterstr>[bracket][bracket]LFR [apos]печатная/рукописная[apos][/bracket][/bracket] AND [bracket][bracket]LRES [apos]ТЕКСТЫ[apos][/bracket][/bracket] AND [bracket]LPUB [apos]КНИГИ[apos][/bracket][separator]<$filtersids>fixed_1_0_1530871811453[END]filter_1_2_0[END]filter_1_3_0[separator]<$fshowstr><i>форма ресурса</i> печатная/рукописная И <i>вид документа</i> тексты И <i>вид издания</i> книги[separator]<query/body>(AH ' . $bookTitle . ') AND ((LFR печатная/рукописная)) AND ((LRES ТЕКСТЫ)) AND (LPUB КНИГИ)[separator]<_history>yes[separator]<userId>ADMIN[separator]<$linkstring>043[ID]Заказ документа[END]044[ID]Заказ копии документа[END][separator]<level[0]>Full[separator]<level[1]>Retro[separator]<level[2]>Unfinished[separator]<level[3]>Identify[separator]<$swfterm>[bracket]AH ' . $bookTitle . '[/bracket] AND [bracket][bracket]LFR [apos]печатная/рукописная[apos][/bracket][/bracket] AND [bracket][bracket]LRES [apos]ТЕКСТЫ[apos][/bracket][/bracket] AND [bracket]LPUB [apos]КНИГИ[apos][/bracket][separator]<_iddb>1[separator]<$addfilters>[NEXT]filter_1_1_else[IND]fixed_1_0_1530871811453[CLASS](LFR печатная/рукописная)[TEXT]печатная/рукописная[separator]<$typework>search[separator]<$basequant>2398048[separator]<$flag45>yes',
                 '_numsean' => '26026'
             ]
         ]);
@@ -344,6 +344,10 @@ HERE;
     }
 
     function areBooksSame($bookInfo1, $bookInfo2) {
+        // Приведение названий в нижний регистр и очистка всех символов, кроме текста и запятой. Это нужно, например, чтобы считать одинаковыми книги «Бизнес: власть» и «Бизнес. Власть»
+        $bookInfo1[title] = mb_strtolower(preg_replace("/[^\p{L},]/u", '', $bookInfo1[title]));
+        $bookInfo2[title] = mb_strtolower(preg_replace("/[^\p{L},]/u", '', $bookInfo2[title]));
+
         if (($bookInfo1[ISBN] == $bookInfo2[ISBN]) || ($bookInfo1[title] == $bookInfo2[title] && mb_strtolower($bookInfo1[publisher]) == mb_strtolower($bookInfo2[publisher])))
             return true;
         else
@@ -442,6 +446,9 @@ HERE;
                 break;
             case 'ГБУК города Москвы "Библиотека искусств им. А. П. Боголюбова"':
                 $libraryName = 'Боголюбова';
+                break;
+            case 'Библиотека им. Ф.В. Гладкова № 224':
+                $libraryName = 'Гладкова';
                 break;
         }
 
@@ -544,6 +551,7 @@ HERE;
         $metro = findMetro($address);
 
         $address = str_replace('д. ', '', $address);
+        $address = str_replace(', к. ', 'к', $address);
         $address = str_replace(', корп. ', 'к', $address);
 
         return $metro . $address;
