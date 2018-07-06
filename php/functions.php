@@ -4,14 +4,14 @@
             $autofocus = 'autofocus';
 
         echo <<<HERE
-            <main class="mt-5">
+            <main class="mt-4">
                 <div class="container">
                     <div class="row">
                          <div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
                              <div class="searchСontainer">
-                                 <label for="search_inp"><h4>Поиск книг в библиотеках Москвы</h4></label>
+                                 <label for="search_inp"><h4>Поиск книг в библиотеках Москвы</h4></label>
                                  <form action="" method="GET" class="form-inline search">
-                                     <input type="search" name="title" id="search_inp" class="form-control" placeholder="Название книги" value='$bookTitle' $autofocus>
+                                     <input type="search" name="title" id="search_inp" class="form-control" placeholder="Название книги, автор, ISBN — всё, что знаете" value='$bookTitle' $autofocus>
                                      <button class="btn btn-primary ml-2">Найти</button>
                                  </form>
                              </div>

@@ -30,7 +30,7 @@
                 // На этой странице есть biblionumber
                 // Если его нет, не было редиректа
                 $doc_MGDB = new DOMDocument();
-                $url_MGDB = "http://catalog.mgdb.ru:49001/cgi-bin/koha/opac-search.pl?limit=branch:CGDB-AB&idx=kw&q=$bookTitle";
+                $url_MGDB = "http://catalog.mgdb.ru:49001/cgi-bin/koha/opac-search.pl?limit=branch:CGDB-AB&idx=kw&sort_by=pubdate_dsc&q=$bookTitle";
                 @$doc_MGDB->loadHTMLFile($url_MGDB);
                 $xpath_MGDB = new DOMXpath($doc_MGDB);
 

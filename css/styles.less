@@ -124,7 +124,7 @@ nav {
 }
 
 .searchСontainer {
-    margin-bottom: 50px;
+    margin-bottom: 45px;
     h4 {
         margin-bottom: .5rem;
     }
@@ -144,18 +144,8 @@ nav {
     }
 }
 
-/*@media (max-width: 992px) {
-    .search-container {
-        form.search {
-            input[type="search"] {
-
-            }
-        }
-    }
-}*/
-
 .bookContainer {
-    margin-bottom: 40px;
+    margin-bottom: 45px;
 
     .row {
         &:last-child {
@@ -296,7 +286,6 @@ nav {
 
             .libraryBooking {
                 max-width: 275px;
-                padding-left: 20px;
 
                 .availabilityAtHome.comma {
                     &::after {
@@ -318,9 +307,40 @@ nav {
                 }
             }
         }
+
+        @media (max-width: 425px) {
+            .library {
+                flex-wrap: wrap;
+
+                .libraryBooking {
+                    margin-top: 4px;
+                }
+            }
+        }
     }
 }
 
-@media (max-width: 438px) {
-    flex-wrap: wrap;
+@media (max-width: 425px) {
+    .bookContainer .row > div {
+        padding: 0;
+
+        .book {
+            border-radius: 0;
+
+            .bookDesc {
+                h2 {
+                    padding-right: 0;
+                }
+
+                padding-left: 15px;
+            }
+        }
+
+        .library {
+            border-radius: 0 !important;
+
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+    }
 }
