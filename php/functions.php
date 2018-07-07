@@ -11,7 +11,7 @@
                              <div class="searchСontainer">
                                  <label for="search_inp"><h4>Поиск книг в библиотеках Москвы</h4></label>
                                  <form action="" method="GET" class="form-inline search">
-                                     <input type="search" name="title" id="search_inp" class="form-control" placeholder="Название книги, автор, ISBN — всё, что знаете" value='$bookTitle' $autofocus>
+                                     <input type="search" name="title" id="search_inp" class="form-control" placeholder="Название книги, автор или ISBN — что знаете" value='$bookTitle' $autofocus>
                                      <button class="btn btn-primary ml-2">Найти</button>
                                  </form>
                              </div>
@@ -298,7 +298,11 @@ HERE;
     function printAllLibsWithSameBook_SKBM($bookInfo_MGDB, $bookInfo_SKBM, $bookI_SKBM, $client, $xpath_SKBM, $booksCount_SKBM, $arrayOfWasteBookI_SKBM) {
         if (areBooksSame($bookInfo_MGDB, $bookInfo_SKBM)) {
             array_push($arrayOfWasteBookI_SKBM, $bookI_SKBM);
-            printLibs($client, $xpath_SKBM, $bookI_SKBM);
+
+            if ($bookInfo_MGDB[year] != $bookInfo_SKBM[year])
+                printLibs($client, $xpath_SKBM, $bookI_SKBM, $bookInfo_SKBM[year]);
+            else
+                printLibs($client, $xpath_SKBM, $bookI_SKBM, '');
 
             // Вывод библиотек, в которых есть книга с $bookI_SKBM, и запись их индексов в массив, чтобы не выводить ещё раз
             $nextBookIAfterCurrent_SKBM = $bookI_SKBM + 1;
@@ -320,7 +324,11 @@ HERE;
                 // Проверка на совпадение. Сравнение ISBN или названия и издательства
                 if (areBooksSame($bookInfo_SKBM, $bookNextInfo_SKBM)) {
                     array_push($arrayOfWasteBookI_SKBM, $nextBookI_SKBM);
-                    printLibs($client, $xpath_SKBM, $nextBookI_SKBM);
+
+                    if ($bookInfo_MGDB[year] != $bookNextInfo_SKBM[year] && $bookInfo_SKBM[year] != $bookNextInfo_SKBM[year])
+                        printLibs($client, $xpath_SKBM, $nextBookI_SKBM, $bookNextInfo_SKBM[year]);
+                    else
+                        printLibs($client, $xpath_SKBM, $nextBookI_SKBM, '');
                 }
             }
         }
@@ -332,7 +340,7 @@ HERE;
         printBook($bookInfo_SKBM);
 
         array_push($arrayOfWasteBookI_SKBM, $bookI_SKBM);
-        printLibs($client, $xpath_SKBM, $bookI_SKBM);
+        printLibs($client, $xpath_SKBM, $bookI_SKBM, '');
 
         // Вывод библиотек, в которых есть книга с $bookI_SKBM, и запись их индексов в массив, чтобы не выводить ещё раз
         $nextBookIAfterCurrent_SKBM = $bookI_SKBM + 1;
@@ -354,7 +362,11 @@ HERE;
             // Проверка на совпадение. Сравнение ISBN или названия и издательства
             if (areBooksSame($bookInfo_SKBM, $bookNextInfo_SKBM)) {
                 array_push($arrayOfWasteBookI_SKBM, $nextBookI_SKBM);
-                printLibs($client, $xpath_SKBM, $nextBookI_SKBM);
+
+                if ($bookInfo_SKBM[year] != $bookNextInfo_SKBM[year])
+                    printLibs($client, $xpath_SKBM, $nextBookI_SKBM, $bookNextInfo_SKBM[year]);
+                else
+                    printLibs($client, $xpath_SKBM, $nextBookI_SKBM, '');
             }
         }
 
@@ -423,7 +435,7 @@ HERE;
             return true;
     }
 
-    function printLibs($client, $xpathSKBM, $bookI) {
+    function printLibs($client, $xpathSKBM, $bookI, $bookInfoYear) {
         // Библиотечные системы у книги
         $librarySystemCount = $xpathSKBM->query('//div[@id="searchrezult"]/div[@class="searchrez"]['.$bookI.']//div[@class="level"]')->length;
         for ($librarySystemI = 1; $librarySystemI <= $librarySystemCount; $librarySystemI += 2) {
@@ -434,7 +446,7 @@ HERE;
             if ($libraryFullAddress) {
                 // Это библиотека-одиночка
                 $libraryAuthID = $xpathSKBM->query('//div[@id="searchrezult"]/div[@class="searchrez"]['.$bookI.']//div[@class="level"]['.$librarySystemI.']/div[@class="row"][1]/div[@class="td w30 p5x"]/input[@class="authid"]/@value')[0]->nodeValue;
-                printLib($libraryName, $libraryFullAddress, $libraryAuthID, $client);
+                printLib($libraryName, $libraryFullAddress, $libraryAuthID, $client, $bookInfoYear);
             }
             else {
                 // Это библиотека-система
@@ -446,13 +458,13 @@ HERE;
                     $libraryName = $xpathSKBM->query('//div[@id="searchrezult"]/div[@class="searchrez"]['.$bookI.']//div[@class="level"]['.$librarySystemContentI.']/div[@class="row"]['.$i.']/div[@class="td loc"][1]//b')[0]->nodeValue;
                     $libraryFullAddress = $xpathSKBM->query('///div[@id="searchrezult"]/div[@class="searchrez"]['.$bookI.']//div[@class="level"]['.$librarySystemContentI.']/div[@class="row"]['.$i.']/div[@class="td loc"][1]/p[2]')[0]->nodeValue;
                     $libraryAuthID = $xpathSKBM->query('//div[@id="searchrezult"]/div[@class="searchrez"]['.$bookI.']//div[@class="level"]['.$librarySystemContentI.']/div[@class="row"]['.$i.']/div[@class="td w30 p5x"]/input[@class="authid"]/@value')[0]->nodeValue;
-                    printLib($libraryName, $libraryFullAddress, $libraryAuthID, $client);
+                    printLib($libraryName, $libraryFullAddress, $libraryAuthID, $client, $bookInfoYear);
                 }
             }
         }
     }
 
-    function printLib($libraryName, $libraryFullAddress, $libraryAuthID, $client) {
+    function printLib($libraryName, $libraryFullAddress, $libraryAuthID, $client, $bookInfoYear) {
         // Отказ в печати библиотек, которые не выдают книги на дом взрослым
         if (strpos($libraryName, 'Детская') !== false || strpos($libraryName, 'детская') !== false || strpos($libraryName, 'читальня') !== false)
             return false;
@@ -516,11 +528,15 @@ HERE;
 
         if (!$libraryAddress)
             $libraryAddress = '&nbsp;';
-        
+
+        if ($bookInfoYear)
+            $libraryBooking = "<div class='libraryBooking'>Книга издана в&nbsp;$bookInfoYear</div>";
+
         $libraryInfo = [
             "name" => $libraryNameTypografed,
             "address" => $libraryAddress,
-            "timetable" => $libraryTimetable
+            "timetable" => $libraryTimetable,
+            "availability" => $libraryBooking
         ];
 
         printLibrary($libraryInfo);
