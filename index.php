@@ -1,6 +1,3 @@
-<?php
-    echo '● Разработка в прямом эфире';
-?>
 <html lang="ru">
     <head>
         <meta charset="utf-8">
@@ -10,6 +7,10 @@
         <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
         <link href="css/styles.less" rel="stylesheet/less" type="text/css">
+        <!--[if lt IE 9]>
+            <script src="http://cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+            <script src="https://raw.githubusercontent.com/jonathantneal/flexibility/master/flexibility.js"></script>
+        <![endif]-->
     </head>
     <body>
         <?php
@@ -95,10 +96,27 @@
                 // Вывод оставшихся карточек
                 // СКБМ
                 $arrayOfWasteBookI_SKBM = printBooksAndLibs_SKBM($booksCount_SKBM, $xpath_SKBM, $client, $arrayOfWasteBookI_SKBM, $bookInfo_MGDB, 'notCheckOnSameWithBookMGDB');
+
+                if ($findNoFound_MGDB && $booksCount_SKBM < 2)
+                    echo '<div class="container"><div class="row"><div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">Такой книги нет в библиотеках, по которым ведётся поиск: в Деловой библиотеке и Сводном каталоге</div></div>';
             }
         ?>
             </div>
         </main>
+        <footer<?php if (!$bookTitle || ($findNoFound_MGDB && $booksCount_SKBM < 2)) { echo ' class="index"'; } ?>>
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
+                        <p>
+                            <a href="#" class="static">О проекте</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="#" class="static">Библиотеки-участники</a>&nbsp;&nbsp;·&nbsp;&nbsp;См. также каталоги <a href="http://rgub.ru/searchopac/" class="static">РГБМ</a>&nbsp;и <a href="https://libfl.ru/ru/item/catalogue" class="static">Рудомино</a>
+                        </p>
+                        <p>
+                            Если есть вопрос, нашли ошибку — пожалуйста, пишите: <a href="mailto:ilya@sidorchik.ru" class="static">ilya@sidorchik.ru</a> или&nbsp;<a href="https://t.me/ilyasidorchik" class="static">@ilyasidorchik</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </footer>
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
