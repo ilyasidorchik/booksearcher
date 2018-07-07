@@ -108,10 +108,10 @@
                 <div class="row">
                     <div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
                         <p>
-                            <a href="#" class="static">О проекте</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="#" class="static">Библиотеки-участники</a>&nbsp;&nbsp;·&nbsp;&nbsp;См. также каталоги <a href="http://rgub.ru/searchopac/" class="static">РГБМ</a>&nbsp;и <a href="https://libfl.ru/ru/item/catalogue" class="static">Рудомино</a>
+                            <a href="http://sidorchik.ru/blog/all/booksearcher-beta1/" class="static">О проекте</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="https://docs.google.com/document/d/1zHMqFfosGLYYG-jE6NskzIqpjWD23PU9avdPaAH0g3Q/edit?usp=sharing" class="static">Библиотеки-участники</a>&nbsp;&nbsp;·&nbsp;&nbsp;См. также каталоги <a href="http://rgub.ru/searchopac/" class="static">РГБМ</a>&nbsp;и <a href="https://libfl.ru/ru/item/catalogue" class="static">Рудомино</a>
                         </p>
                         <p>
-                            Если есть вопрос, нашли ошибку — пожалуйста, пишите: <a href="mailto:ilya@sidorchik.ru" class="static">ilya@sidorchik.ru</a> или&nbsp;<a href="https://t.me/ilyasidorchik" class="static">@ilyasidorchik</a>
+                            Если есть вопрос, замечание — пожалуйста, пишите: <a href="mailto:ilya@sidorchik.ru" class="static">ilya@sidorchik.ru</a> или&nbsp;<a href="https://t.me/ilyasidorchik" class="static">@ilyasidorchik</a>
                         </p>
                     </div>
                 </div>
