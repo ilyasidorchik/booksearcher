@@ -1,16 +1,21 @@
 <html lang="ru">
     <head>
         <meta charset="utf-8">
-        <meta content="width=device-width, initial-scale=1" name="viewport">
         <title>Поиск книг в библиотеках Москвы</title>
-        <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
-        <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+        <meta name="description" content="Узнайте, в каких библиотеках есть нужная вам книга">
+        <meta name="keywords" content="как, где, найти, узнать, проверить, взять, на дом, есть, поиск, нужную, книга, книгу, книг, литература, электронный, единый, сводный, каталог, база, данных, в, библиотека, библиотеках, москва, московских">
+        <meta name="yandex-verification" content="835e608657377f1e" />
+        <meta content="width=device-width, initial-scale=1" name="viewport">
+        <link rel="shortcut icon" href="img/favicon.ico">
+        <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon-180x180.png">
+        <link rel="apple-touch-icon-precomposed" href="img/apple-touch-icon-180x180-precomposed.png">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
         <link href="css/styles.less" rel="stylesheet/less" type="text/css">
         <!--[if lt IE 9]>
             <script src="http://cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
             <script src="https://raw.githubusercontent.com/jonathantneal/flexibility/master/flexibility.js"></script>
         <![endif]-->
+        <!-- Yandex.Metrika counter --> <script> (function (d, w, c) { (w[c] = w[c] || []).push(function() { try { w.yaCounter49510096 = new Ya.Metrika2({ id:49510096, clickmap:true, trackLinks:true, accurateTrackBounce:true, webvisor:true }); } catch(e) { } }); var n = d.getElementsByTagName("script")[0], s = d.createElement("script"), f = function () { n.parentNode.insertBefore(s, n); }; s.type = "text/javascript"; s.async = true; s.src = "https://mc.yandex.ru/metrika/tag.js"; if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); } })(document, window, "yandex_metrika_callbacks2"); </script> <noscript><div><img src="https://mc.yandex.ru/watch/49510096" style="position:absolute; left:-9999px;" alt="" /></div></noscript> <!-- /Yandex.Metrika counter -->
     </head>
     <body>
         <?php
@@ -108,7 +113,7 @@
                 <div class="row">
                     <div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
                         <p>
-                            <a href="http://sidorchik.ru/blog/all/booksearcher-beta1/" class="static">О проекте</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="https://docs.google.com/document/d/1zHMqFfosGLYYG-jE6NskzIqpjWD23PU9avdPaAH0g3Q/edit?usp=sharing" class="static">Библиотеки-участники</a>&nbsp;&nbsp;·&nbsp;&nbsp;См. также каталоги <a href="http://rgub.ru/searchopac/" class="static">РГБМ</a>&nbsp;и <a href="https://libfl.ru/ru/item/catalogue" class="static">Рудомино</a>
+                            <a href="http://sidorchik.ru/blog/all/booksearcher-beta1/" class="static">О проекте</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="https://docs.google.com/document/d/1zHMqFfosGLYYG-jE6NskzIqpjWD23PU9avdPaAH0g3Q/edit?usp=sharing" class="static"><nobr>Библиотеки-участники</nobr></a>&nbsp;&nbsp;·&nbsp;&nbsp;<wbr>Поиск&nbsp;<a href="http://rgub.ru/searchopac/" class="static">по РГБМ</a> и <a href="https://libfl.ru/ru/item/catalogue" class="static">Рудомино</a>
                         </p>
                         <p>
                             Если есть вопрос, замечание — пожалуйста, пишите: <a href="mailto:ilya@sidorchik.ru" class="static">ilya@sidorchik.ru</a> или&nbsp;<a href="https://t.me/ilyasidorchik" class="static">@ilyasidorchik</a>
