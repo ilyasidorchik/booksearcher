@@ -4,7 +4,7 @@
         <title>Поиск книг в библиотеках Москвы</title>
         <meta name="description" content="Узнайте, в каких библиотеках есть нужная вам книга">
         <meta name="keywords" content="как, где, найти, узнать, проверить, взять, на дом, есть, поиск, нужную, книга, книгу, книг, литература, электронный, единый, сводный, каталог, база, данных, в, библиотека, библиотеках, москва, московских">
-        <meta name="yandex-verification" content="835e608657377f1e" />
+        <!--<meta name="yandex-verification" content="835e608657377f1e" />-->
         <meta content="width=device-width, initial-scale=1" name="viewport">
         <link rel="shortcut icon" href="img/favicon.ico">
         <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon-180x180.png">
@@ -15,7 +15,7 @@
             <script src="http://cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
             <script src="https://raw.githubusercontent.com/jonathantneal/flexibility/master/flexibility.js"></script>
         <![endif]-->
-        <!-- Yandex.Metrika counter --> <script> (function (d, w, c) { (w[c] = w[c] || []).push(function() { try { w.yaCounter49510096 = new Ya.Metrika2({ id:49510096, clickmap:true, trackLinks:true, accurateTrackBounce:true, webvisor:true }); } catch(e) { } }); var n = d.getElementsByTagName("script")[0], s = d.createElement("script"), f = function () { n.parentNode.insertBefore(s, n); }; s.type = "text/javascript"; s.async = true; s.src = "https://mc.yandex.ru/metrika/tag.js"; if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); } })(document, window, "yandex_metrika_callbacks2"); </script> <noscript><div><img src="https://mc.yandex.ru/watch/49510096" style="position:absolute; left:-9999px;" alt="" /></div></noscript> <!-- /Yandex.Metrika counter -->
+        <!-- Yandex.Metrika counter <script> (function (d, w, c) { (w[c] = w[c] || []).push(function() { try { w.yaCounter49510096 = new Ya.Metrika2({ id:49510096, clickmap:true, trackLinks:true, accurateTrackBounce:true, webvisor:true }); } catch(e) { } }); var n = d.getElementsByTagName("script")[0], s = d.createElement("script"), f = function () { n.parentNode.insertBefore(s, n); }; s.type = "text/javascript"; s.async = true; s.src = "https://mc.yandex.ru/metrika/tag.js"; if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); } })(document, window, "yandex_metrika_callbacks2"); </script> <noscript><div><img src="https://mc.yandex.ru/watch/49510096" style="position:absolute; left:-9999px;" alt="" /></div></noscript> <!-- /Yandex.Metrika counter -->
     </head>
     <body>
         <?php
@@ -42,18 +42,13 @@
 
                 $findNoFound_MGDB = $xpath_MGDB->query("//strong[text() = 'No Results Found!']")->length;
 
-
-                $xpath_SKBM = getXPath_SKBM($client, $bookTitle);
-                $booksCount_SKBM = $xpath_SKBM->query('//div[@id="searchrezult"]/div[@class="searchrez"]')->length;
-
-
                 // В МГДБ что-то есть
                 if (!$findNoFound_MGDB) {
                     // Ищем количество серпов
                     $pages_MGDB = $xpath_MGDB->query('//*[@id="userresults"]/div[2]/a[@class="nav"]')->length * 20;
 
-                    // Если серпов 0 — значит одна страница
-                    if (!$pages_MGDB)
+                    // Если серпов 0 — значит, одна страница
+                    if ($pages_MGDB == 0)
                         $pages_MGDB = 1;
 
                     // $page увеличиваем на 20, потому что так меняется урл у следующих страниц
@@ -88,10 +83,9 @@
                             $libraryInfo_MGDB = getLibraryInfo('ЦГДБ', $biblionumber_MGDB);
                             printLibrary($libraryInfo_MGDB);
 
-
                             // Вывод библиотек, в которых есть эта книга или такая же, но с другим годом издания. Переменная-массив нужна, чтобы дальше не печатать ненужное
                             // Библиотеки СКБМ
-                            $arrayOfWasteBookI_SKBM = printBooksAndLibs_SKBM($booksCount_SKBM, $xpath_SKBM, $client, $arrayOfWasteBookI_SKBM, $bookInfo_MGDB, 'checkOnSameWithBookMGDB');
+                            $arrayOfWasteBookI_SKBM = printBooksAndLibs_SKBM($client, $bookTitle, $arrayOfWasteBookI_SKBM, $bookInfo_MGDB, 'checkOnSameWithBookMGDB');
 
                             printBookContainerEnd();
                         }
@@ -100,15 +94,15 @@
 
                 // Вывод оставшихся карточек
                 // СКБМ
-                $arrayOfWasteBookI_SKBM = printBooksAndLibs_SKBM($booksCount_SKBM, $xpath_SKBM, $client, $arrayOfWasteBookI_SKBM, $bookInfo_MGDB, 'notCheckOnSameWithBookMGDB');
+                $arrayOfWasteBookI_SKBM = printBooksAndLibs_SKBM($client, $bookTitle, $arrayOfWasteBookI_SKBM, $bookInfo_MGDB, 'notCheckOnSameWithBookMGDB');
 
-                if ($findNoFound_MGDB && $booksCount_SKBM < 2)
-                    echo '<div class="container"><div class="row"><div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">Такой книги нет в библиотеках, по которым ведётся поиск: в Деловой библиотеке и Сводном каталоге</div></div>';
+                //if ($findNoFound_MGDB) // добавить случай, если нет книг в СКБМ
+                    //echo '<div class="container"><div class="row"><div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">Такой книги нет в библиотеках, по которым ведётся поиск: в Деловой библиотеке и Сводном каталоге</div></div>';
             }
         ?>
             </div>
         </main>
-        <footer<?php if (!$bookTitle || ($findNoFound_MGDB && $booksCount_SKBM < 2)) { echo ' class="index"'; } ?>>
+        <footer<?php if (!$bookTitle) { echo ' class="index"'; } ?>>
             <div class="container">
                 <div class="row">
                     <div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
