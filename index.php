@@ -94,7 +94,7 @@
 
                 // Вывод оставшихся карточек
                 // СКБМ
-                printBooksAndLibs_SKBM($client, $bookTitle, $arrayOfWasteBookI_SKBM, $bookInfo_MGDB, 'notCheckOnSameWithBookMGDB');
+                $arrayOfWasteBookI_SKBM .= printBooksAndLibs_SKBM($client, $bookTitle, $arrayOfWasteBookI_SKBM, $bookInfo_MGDB, 'notCheckOnSameWithBookMGDB');
 
                 if ($findNoFound_MGDB && empty($arrayOfWasteBookI_SKBM)) // добавить случай, если нет книг в СКБМ
                     echo '<div class="container"><div class="row"><div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">Такой книги нет в библиотеках, по которым ведётся поиск: в Деловой библиотеке и Сводном каталоге</div></div>';
@@ -102,7 +102,7 @@
         ?>
             </div>
         </main>
-        <footer<?php if (!$bookTitle) { echo ' class="index"'; } ?>>
+        <footer<?php if (!$bookTitle || ($findNoFound_MGDB && empty($arrayOfWasteBookI_SKBM))) { echo ' class="index"'; } ?>>
             <div class="container">
                 <div class="row">
                     <div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
