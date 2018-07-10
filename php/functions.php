@@ -262,8 +262,7 @@ HERE;
             @$doc_SKBM->loadHTML($html_SKBM);
             $xpath_SKBM = new DOMXpath($doc_SKBM);
 
-            if ($pages_SKBM === 1)
-                $pages_SKBM = $xpath_SKBM->query('//*[@id="infor"]/div[5]/p[1]/*')->length;
+            $pages_SKBM = $xpath_SKBM->query('//*[@id="infor"]/div[5]/p[1]/*')->length;
 
             $booksCount_SKBM = $xpath_SKBM->query('//div[@id="searchrezult"]/div[@class="searchrez"]')->length;
 
