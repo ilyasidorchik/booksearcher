@@ -292,7 +292,7 @@ HERE;
                 if ($isCheckOnSame == 'checkOnSameWithBookMGDB')
                     $arrayOfWasteBookI_SKBM = printLibsWithSameBookMGDB_SKBM($bookInfo_MGDB, $bookInfo_SKBM, $page_SKBM, $bookI_SKBM, $client, $xpath_SKBM, $booksCount_SKBM, $arrayOfWasteBookI_SKBM);
                 else {
-                    $arrayOfWasteBookI_SKBM = printBookAndLibsWithIt_SKBM($bookInfo_SKBM, $bookI_SKBM, $client, $xpath_SKBM, $pages_SKBM, $page_SKBM, $booksCount_SKBM, $arrayOfWasteBookI_SKBM);
+                    $arrayOfWasteBookI_SKBM = printBookAndLibsWithIt_SKBM($bookTitle, $bookInfo_SKBM, $bookI_SKBM, $client, $xpath_SKBM, $pages_SKBM, $page_SKBM, $booksCount_SKBM, $arrayOfWasteBookI_SKBM);
                     printBookContainerEnd();
                 }
             }
@@ -342,18 +342,19 @@ HERE;
         return $arrayOfWasteBookI_SKBM;
     }
 
-    function printBookAndLibsWithIt_SKBM($bookInfo_SKBM, $bookI_SKBM, $client, $xpath_SKBM, $pages_SKBM, $page_SKBM, $booksCount_SKBM, $arrayOfWasteBookI_SKBM) {
+    function printBookAndLibsWithIt_SKBM($bookTitle, $bookInfo_SKBM, $bookI_SKBM, $client, $xpath_SKBM, $pages_SKBM, $page_SKBM, $booksCount_SKBM, $arrayOfWasteBookI_SKBM) {
         printBook($bookInfo_SKBM);
 
         array_push($arrayOfWasteBookI_SKBM, $page_SKBM . '_' . $bookI_SKBM);
         printLibs($client, $xpath_SKBM, $bookI_SKBM, '');
 
         // Вывод библиотек, в которых есть книга с $bookI_SKBM, и запись их индексов в массив, чтобы не выводить ещё раз
-        $nextBookIAfterCurrent_SKBM = $bookI_SKBM + 1;
         $pageStart_SKBM = $page_SKBM;
         for ($page_SKBM = $pageStart_SKBM; $page_SKBM <= $pages_SKBM; $page_SKBM++) {
             // Чтобы не делать ещё раз такой же запрос
             if ($page_SKBM > $pageStart_SKBM) {
+                $bookI_SKBM = 0;
+
                 $pageForRequest_SKBM = ($page_SKBM - 1) * 15;
 
                 // Запрос на страницу выдачи, ответ
@@ -379,6 +380,7 @@ HERE;
                 $booksCount_SKBM = $xpath_SKBM->query('//div[@id="searchrezult"]/div[@class="searchrez"]')->length;
             }
 
+            $nextBookIAfterCurrent_SKBM = $bookI_SKBM + 1;
             for ($nextBookI_SKBM = $nextBookIAfterCurrent_SKBM; $nextBookI_SKBM <= $booksCount_SKBM; $nextBookI_SKBM++) {
                 if (!isLibraryFit($xpath_SKBM, $nextBookI_SKBM)) {
                     array_push($arrayOfWasteBookI_SKBM, $page_SKBM . '_' . $nextBookI_SKBM);
