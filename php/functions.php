@@ -264,6 +264,10 @@ HERE;
 
             $pages_SKBM = $xpath_SKBM->query('//*[@id="infor"]/div[5]/p[1]/*')->length;
 
+            // Чтобы была одна страница
+            if ($pages_SKBM == 0)
+                $pages_SKBM = 1;
+
             $booksCount_SKBM = $xpath_SKBM->query('//div[@id="searchrezult"]/div[@class="searchrez"]')->length;
 
             for ($bookI_SKBM = 2; $bookI_SKBM <= $booksCount_SKBM; $bookI_SKBM++) {
