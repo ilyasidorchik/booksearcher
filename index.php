@@ -1,3 +1,4 @@
+<!-- Поиск книг в библиотеках Москвы. Бета 2 © Илья Сидорчик -->
 <html lang="ru">
     <head>
         <meta charset="utf-8">
@@ -96,66 +97,9 @@
                 // СКБМ
                 $arrayOfWasteBookI_SKBM .= printBooksAndLibs_SKBM($client, $bookTitle, $arrayOfWasteBookI_SKBM, $bookInfo_MGDB, 'notCheckOnSameWithBookMGDB');
 
-                if ($findNoFound_MGDB && empty($arrayOfWasteBookI_SKBM)) {
-                    echo <<<HERE
-                        <div class="container">
-                            <div class="row mb-3">
-                                <div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
-                                    <b>Книги нет</b>
-                                    <p>Но она может появиться через <nobr>полгода-год</nobr>, если вы попросите библиотеку Некрасова:</p>
-                                </div>
-                            </div>  
-                            <div class="row">
-                                <div class="col-sm-12 col-md-12 col-lg-6 offset-lg-1 col-xl-4 offset-xl-2">        
-                                    <form action="requested.php" method="POST" style="background: #f0f0f0;">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalCenterTitle">Запрос книги</h5>
-                                        </div>
-                                        <div class="modal-body">
-                                            <input type="hidden" name="title" value='$bookTitle'>
-                                            <div class="form-group">
-                                                <label for="author">Автор</label>
-                                                <input type="text" class="form-control" id="author" name="author" aria-describedby="authorHelp" required>
-                                                <small id="authorHelp" class="form-text text-muted">Чтобы не подумали о другой книге</small>
-                                            </div>
-HERE;
 
-                    // Если в учётной записи нет почты — показываем поля почты и фамилии
-                    $encryption = $_COOKIE["encryption"];
-
-                    /* Подключение к базе данных */
-                    include 'php/db_connection.php';
-                    $link = mysqli_connect($host, $user, $password, $database) or die("Ошибка");
-                    mysqli_set_charset($link, 'utf8');
-
-                    $result = mysqli_query($link, "SELECT email FROM readers WHERE encryption = '$encryption'");
-                    $row = mysqli_fetch_assoc($result);
-                    if (!$row['email']) {
-                        echo <<<HERE
-                                            <div class="form-group">
-                                                <label for="email">Ваша эл. почта</label>
-                                                <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" required>
-                                                <small id="emailHelp" class="form-text text-muted">Библиотекарь напишет в случае чего</small>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="surname">Ваша фамилия</label>
-                                                <input type="text" class="form-control" id="surname" name="surname" aria-describedby="surnameHelp" required>
-                                                <small id="surnameHelp" class="form-text text-muted">Для связи с библиотекарем</small>
-                                            </div>
-HERE;
-                    }
-
-                    echo <<<HERE
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button name="toRequest" class="btn btn-primary">Запросить</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-HERE;
-                }
+                if ($findNoFound_MGDB && empty($arrayOfWasteBookI_SKBM))
+                    printMessageAboutNoFoundAndRequestForm($bookTitle);
             }
         ?>
             </div>
@@ -176,7 +120,8 @@ HERE;
         </footer>
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="http://cdnjs.cloudflare.com/ajax/libs/less.js/3.0.0/less.min.js"></script>
+        <script src="js/script.js"></script>
     </body>
 </html>

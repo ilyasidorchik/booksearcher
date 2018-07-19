@@ -20,6 +20,81 @@
 HERE;
     }
 
+    function printMessageAboutNoFoundAndRequestForm($bookTitle) {
+        echo <<<HERE
+                        <div class="container">
+                            <div class="row mb-3">
+                                <div class="d-none d-md-block col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
+                                    <b>Книги нет</b>
+                                    <p>Но она может появиться через <nobr>полгода-год</nobr>, <nobr>если вы попросите библиотеку Некрасова:</nobr></p>
+                                </div>
+                                <div class="d-block d-md-none">
+                                    <b>Книги нет</b>
+                                    <p>Но она может появиться через <nobr>полгода-год</nobr>, если вы попросите библиотеку Некрасова:</p>
+                                </div>
+                            </div>  
+                            <div class="row">
+                                <div class="col-sm-12 col-md-7 col-lg-5 offset-lg-1 col-xl-4 offset-xl-2">     
+                                    <form enctype="multipart/form-data" method="POST" class="form" id="form">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalCenterTitle">Запрос книги</h5>
+                                        </div>
+                                        <div class="modal-body">
+                                            <input type="hidden" name="title" value='$bookTitle'>
+                                            <div class="form-group">
+                                                <label for="author">Автор</label>
+                                                <input type="text" class="form-control" id="author" name="author" aria-describedby="authorHelp" required>
+                                                <small id="authorHelp" class="form-text text-muted">Чтобы не подумали о другой книге</small>
+                                            </div>
+HERE;
+
+        // Если в учётной записи нет почты — показываем поля почты и фамилии
+        $encryption = $_COOKIE["encryption"];
+
+        /* Подключение к базе данных */
+        include 'db_connection.php';
+        $link = mysqli_connect($host, $user, $password, $database) or die("Ошибка");
+
+        $result = mysqli_query($link, "SELECT email FROM readers WHERE encryption = '$encryption'");
+        $row = mysqli_fetch_assoc($result);
+        if (!$row['email']) {
+            echo <<<HERE
+                                            <div class="form-group">
+                                                <label for="email">Ваша эл. почта</label>
+                                                <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" required>
+                                                <small id="emailHelp" class="form-text text-muted">Библиотекарь напишет в случае чего</small>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="surname">Ваша фамилия</label>
+                                                <input type="text" class="form-control" id="surname" name="surname" aria-describedby="surnameHelp" required>
+                                                <small id="surnameHelp" class="form-text text-muted">Для связи с библиотекарем</small>
+                                            </div>
+HERE;
+        }
+        else
+            $email = $row['email'];
+
+        $title = typograf('«' . $bookTitle . '»');
+        
+        echo <<<HERE
+                                        </div>
+                                        <div class="modal-footer">
+                                            <input type="submit" name="toRequest" value="Запросить" class="btn btn-primary" id="submit">
+                                        </div>
+                                    </form>
+                                    <div class="formProof alert alert-success" role="alert" style="display: none;">
+                                        <h4 class="alert-heading">
+                                            Книга запрошена
+                                        </h4>
+                                        <p>В отдел формирования фонда библиотеки Некрасова отправлено письмо с просьбой приобрести книгу $title автора <span id="authorAdd"></span>.</p>
+                                        <p>Если книгу одобрят, она появится не скоро: через <nobr>полгода-год</nobr>. С вами должны связаться по почте <span id="emailAdd">$email</span>.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+HERE;
+    }
+
     function getHtmlWithBookDetails_SKBM($client, $xpath_SKBM, $bookI_SKBM) {
         $bookID_SKBM = $xpath_SKBM->query('//div[@id="searchrezult"]/div[@class="searchrez"][' . $bookI_SKBM . ']/@id')[0]->nodeValue;
         $bookID_SKBM = str_replace('\\\\\\\\', '\\', $bookID_SKBM);
@@ -745,15 +820,30 @@ HERE;
             ]
         ]);
     }
-    function sendEmailForRequesting($client, $email, $surname, $title, $author) {
-        $response = $client->request('POST', 'http://sidorchik.ru/mail-for-book-requesting/', [
-            'form_params' => [
-                'email' => $email,
-                'surname' => $surname,
-                'title' => $title,
-                'author' => $author
-            ]
-        ]);
+    function sendEmailForRequesting($title, $author, $surname, $email) {
+        $titleQuoted = '«' . $title . '»';
+        
+        $to = 'ilya@sidorchik.ru';
+        /*$to = 'off@nekrasovka.ru'; (для продакшена) */
+        $title = "Просьба заказать книгу $titleQuoted";
+        $headers  = 'MIME-Version: 1.0' . "\r\n";
+        $headers .= "Content-type: text/html; charset=utf-8 \r\n";
+        $headers .= "From: $surname <'$email'>\r\n";
+
+        $titleTypografed = typograf($titleQuoted);
+
+        $mess = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+			    <html>
+				    <head>
+						<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	                    <title>'. $title .'</title>
+					</head>
+					<body><p>Здравствуйте!</p>
+							<p>Я хотел бы прочитать книгу ' . $titleTypografed . ' автора ' . $author . ', но этой книги нет ни в одной московской библиотеке для выдачи на дом. Пожалуйста, приобретите её.</p>
+					</body>
+				</html>';
+
+        mail($to, $title, $mess, $headers);
     }
 
     function getReaderID($link, $encryption) {
