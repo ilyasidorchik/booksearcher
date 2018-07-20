@@ -25,11 +25,11 @@ HERE;
                         <div class="container">
                             <div class="row mb-3">
                                 <div class="d-none d-md-block col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
-                                    <b>Книги нет</b>
+                                    <b>Книги нет <a href="https://docs.google.com/document/d/1zHMqFfosGLYYG-jE6NskzIqpjWD23PU9avdPaAH0g3Q/edit?usp=sharing" class="static"><nobr>в библиотеках-участниках</nobr></a></b>
                                     <p>Но она может появиться через <nobr>полгода-год</nobr>, <nobr>если вы попросите библиотеку Некрасова:</nobr></p>
                                 </div>
                                 <div class="d-block d-md-none">
-                                    <b>Книги нет</b>
+                                    <b>Книги нет <a href="https://docs.google.com/document/d/1zHMqFfosGLYYG-jE6NskzIqpjWD23PU9avdPaAH0g3Q/edit?usp=sharing" class="static">в библиотеках-участниках</a></b>
                                     <p>Но она может появиться через <nobr>полгода-год</nobr>, если вы попросите библиотеку Некрасова:</p>
                                 </div>
                             </div>  
@@ -217,7 +217,7 @@ HERE;
                 else {
                     $pages = preg_replace("/[^0-9]/", '', $pagesOriginally);
                 }
-                $pages .= ' стр.';
+                $pages .= '&nbsp;с.';
 
                 break;
         }
@@ -823,8 +823,7 @@ HERE;
     function sendEmailForRequesting($title, $author, $surname, $email) {
         $titleQuoted = '«' . $title . '»';
         
-        $to = 'ilya@sidorchik.ru';
-        /*$to = 'off@nekrasovka.ru'; (для продакшена) */
+        $to = 'off@nekrasovka.ru';
         $title = "Просьба заказать книгу $titleQuoted";
         $headers  = 'MIME-Version: 1.0' . "\r\n";
         $headers .= "Content-type: text/html; charset=utf-8 \r\n";
