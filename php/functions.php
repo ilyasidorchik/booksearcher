@@ -138,7 +138,7 @@ HERE;
                 $year = $xpathMarc->query("//tr[td='Дата издания, распространения и т.д.']/td[2]")[0]->nodeValue;
 
                 $pages = $xpathMarc->query("//tr[td='Объем и специфическое обозначение материала']/td[2]")[0]->nodeValue;
-                $pages = preg_replace("/[^0-9]/", '', $pages) . ' стр.';
+                $pages = preg_replace("/[^0-9]/", '', $pages) . '&nbsp;с.';
 
                 break;
 
@@ -235,7 +235,7 @@ HERE;
         return $bookInfo;
     }
 
-    function getLibraryInfo($library, $source) {
+    function getLibraryInfo($library, $source, $bookInfo_MGDB) {
         switch ($library) {
             case 'ЦГДБ':
                 $docNormal = new DOMDocument();
@@ -265,6 +265,50 @@ HERE;
 
                 // Формирование дива .libraryBooking о доступности
                 if ($availability > 0)  {
+                    $bookingButton = "<div class='libraryBookingButton'>
+                                            <button type='button' class='btn btn-outline-dark btn-sm' data-toggle='modal' data-target='#bookingForm'>Забронировать…</button>
+                                        
+                                            <div class='modal fade' id='bookingForm' tabindex='-1' role='dialog' aria-labelledby='bookingFormTitle' aria-hidden='true'>
+                                                <div class='modal-dialog modal-dialog-centered' role='document'>
+                                                    <div class='modal-content formBooking'>
+                                                          <div class='modal-header'>
+                                                                <h5 class='modal-title' id='exampleModalCenterTitle'>Бронирование книги</h5>
+                                                                <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+                                                                  <span aria-hidden='true'>&times;</span>
+                                                                </button>
+                                                          </div>
+                                                          <form action='booked.php' method='POST' id='formBooking'>
+                                                              <div class='modal-body'>
+                                                                    <div class='form-group'>
+                                                                        <label for='email'>Ваша эл. почта</label>
+                                                                        <input type='email' class='form-control' id='email' name='email' aria-describedby='emailHelp' required>
+                                                                        <small id='emailHelp' class='form-text text-muted'>Библиотекарь подтвердит бронь или напишет в случае чего</small>
+                                                                    </div>
+                                                                    <div class='form-group'>
+                                                                        <label for='surname'>Ваша фамилия</label>
+                                                                        <input type='text' class='form-control' id='surname' name='surname' aria-describedby='surnameHelp' required>
+                                                                        <small id='surnameHelp' class='form-text text-muted'>Назовёте в библиотеке</small>
+                                                                    </div>
+                                                                    <input type='hidden' name='title' value='$bookInfo_MGDB[title]'>
+                                                                    <input type='hidden' name='author' value='$bookInfo_MGDB[author]'>
+                                                                    <input type='hidden' name='publisher' value='$bookInfo_MGDB[publisher]'> 
+                                                                    <input type='hidden' name='year' value='$bookInfo_MGDB[year]'>
+                                                                    <input type='hidden' name='pages' value='$bookInfo_MGDB[pages]'>
+                                                                </div>
+                                                              <div class='modal-footer'>
+                                                                    <button name='toBook' class='btn btn-primary'>Забронировать</button>
+                                                              </div>
+                                                          </form>
+                                                    </div>
+                                                    <div class='formProof alert alert-success' role='alert' style='display: none;'>
+                                                        <h4 class='alert-heading'>Книга забронирована</h4>
+                                                        <p>В Деловую библиотеку отправлено письмо с просьбой забронировать книгу на фамилию <span id='surnameAdd'>$surname</span>. Почту регулярно проверяет секретарь, он передаст просьбу библиотекарю.</p>
+                                                        <p><i>Как забрать книгу.</i> Входите в библиотеку, идёте направо, говорите библиотекарю о броне, называете свою фамилию.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                      </div>";
+
                     $availabilityInfo = $availability . ' книг';
                     switch ($availability) {
                         case 1:
@@ -302,7 +346,7 @@ HERE;
                 if ($availabilityOnHands)
                     $libraryBooking .= "<div class='availabilityOnHands'>$availabilityOnHandsInfo</div>";
 
-                $libraryBooking = "<div class='libraryBooking'>$libraryBooking</div>";
+                $libraryBooking = "<div class='libraryBooking'><div class='libraryBookingText'>$libraryBooking</div>$bookingButton</div>";
 
                 return $library = [
                     "name" => "Деловая библиотека",
@@ -808,22 +852,41 @@ HERE;
         return $strTypografed;
     }
 
-    function sendEmailForBooking($client, $email, $surname, $title, $author, $publisher, $year) {
-        $response = $client->request('POST', 'http://sidorchik.ru/mail-for-book-booking/', [
-            'form_params' => [
-                'email' => $email,
-                'surname' => $surname,
-                'title' => $title,
-                'author' => $author,
-                'publisher' => $publisher,
-                'year' => $year
-            ]
-        ]);
+    function sendEmailForBooking($email, $surname, $title, $author, $publisher, $year) {
+        $titleQuoted = '«' . $title . '»';
+
+        // $to = 'off@nekrasovka.ru'; // для продакшена
+        $to = 'ilya@sidorchik.ru';
+        $title = "Бронирование книги $titleQuoted";
+        $headers  = 'MIME-Version: 1.0' . "\r\n";
+        $headers .= "Content-type: text/html; charset=utf-8 \r\n";
+        $headers .= "From: $surname <'$email'>\r\n";
+
+        $titleTypografed = typograf($titleQuoted);
+
+        $mess = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+			    <html>
+				    <head>
+						<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	                    <title>'. $title .'</title>
+					</head>
+					<body>
+					    <p>Здравствуйте!</p>
+							
+						<p>Отложите для меня, пожалуйста, книгу ' . $titleTypografed . ': автор ' . $author . ', издательство «' . $publisher . '», год выпуска ' . $year . '.</p>
+							
+						<p>Моя фамилия — ' . $surname . '.</p>
+					</body>
+				</html>';
+
+        mail($to, $title, $mess, $headers);
     }
+
     function sendEmailForRequesting($title, $author, $surname, $email) {
         $titleQuoted = '«' . $title . '»';
         
-        $to = 'off@nekrasovka.ru';
+        // $to = 'off@nekrasovka.ru'; // для продакшена
+        $to = 'ilya@sidorchik.ru';
         $title = "Просьба заказать книгу $titleQuoted";
         $headers  = 'MIME-Version: 1.0' . "\r\n";
         $headers .= "Content-type: text/html; charset=utf-8 \r\n";

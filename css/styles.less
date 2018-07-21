@@ -270,7 +270,7 @@ nav {
             background: #f0f0f0;
             border-bottom: 1px solid rgba(0,0,0,.08);
 
-            .libraryDesc {
+            &Desc {
                 .name {
                     font-weight: bold;
                 }
@@ -293,13 +293,21 @@ nav {
                 }
             }
 
-            .libraryBooking {
-                max-width: 275px;
+            &Booking {
+                display: flex;
+                justify-content: space-between;
+                max-width: 350px;
 
-                .availabilityAtHome.comma {
-                    &::after {
-                        content: ',';
+                &Text {
+                    .availabilityAtHome.comma {
+                        &::after {
+                            content: ',';
+                        }
                     }
+                }
+
+                &Button {
+                    padding-left: 8px;
                 }
             }
 
@@ -317,11 +325,12 @@ nav {
             }
         }
 
-        @media (max-width: 425px) {
+        @media (max-width: 767px) {
             .library {
                 flex-wrap: wrap;
 
                 .libraryBooking {
+                    flex-wrap: wrap;
                     margin-top: 4px;
                 }
             }
@@ -329,7 +338,7 @@ nav {
     }
 }
 
-@media (max-width: 425px) {
+@media (max-width: 767px) {
     .bookContainer .row > div {
         padding: 0;
 

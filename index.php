@@ -1,11 +1,11 @@
-<!-- Поиск книг в библиотеках Москвы. Бета 2 © Илья Сидорчик -->
+<!-- Поиск книг в библиотеках Москвы. Бета 3 © Илья Сидорчик -->
 <html lang="ru">
     <head>
         <meta charset="utf-8">
         <title>Поиск книг в библиотеках Москвы</title>
         <meta name="description" content="Узнайте, в каких библиотеках есть нужная вам книга">
         <meta name="keywords" content="как, где, найти, узнать, проверить, взять, на дом, есть, поиск, нужную, книга, книгу, книг, литература, электронный, единый, сводный, каталог, база, данных, в, библиотека, библиотеках, москва, московских">
-        <meta name="yandex-verification" content="835e608657377f1e" />
+        <!--<meta name="yandex-verification" content="835e608657377f1e" />-->
         <meta content="width=device-width, initial-scale=1" name="viewport">
         <link rel="shortcut icon" href="img/favicon.ico">
         <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon-180x180.png">
@@ -81,7 +81,7 @@
                             $bookInfo_MGDB = getBookInfo('ЦГДБ', $biblionumber_MGDB);
                             printBook($bookInfo_MGDB);
 
-                            $libraryInfo_MGDB = getLibraryInfo('ЦГДБ', $biblionumber_MGDB);
+                            $libraryInfo_MGDB = getLibraryInfo('ЦГДБ', $biblionumber_MGDB, $bookInfo_MGDB);
                             printLibrary($libraryInfo_MGDB);
 
                             // Вывод библиотек, в которых есть эта книга или такая же, но с другим годом издания. Переменная-массив нужна, чтобы дальше не печатать ненужное
@@ -118,9 +118,9 @@
                 </div>
             </div>
         </footer>
-        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
         <script src="http://cdnjs.cloudflare.com/ajax/libs/less.js/3.0.0/less.min.js"></script>
         <script src="js/script.js"></script>
     </body>
