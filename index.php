@@ -25,6 +25,8 @@
 
             use GuzzleHttp\Client;
 
+            $client = new Client();
+
             $bookTitle = $_GET['title'];
 
             printInput($bookTitle);
@@ -33,6 +35,8 @@
                 // Инициализация экземпляра класса для работы с удалённым веб-ресурсом
                 $client = new Client();
 
+                $findNoFound_MGDB = true;
+                /* Деловая библиотека отключена, пока не восстановится их каталог
                 // Если книга одна в каталоге, совершается редирект на отдельную страницу книги
                 // На этой странице есть biblionumber
                 // Если его нет, не было редиректа
@@ -91,7 +95,7 @@
                             printBookContainerEnd();
                         }
                     }
-                }
+                }*/
 
                 // Вывод оставшихся карточек
                 // СКБМ
@@ -102,8 +106,6 @@
                     printMessageAboutNoFoundAndRequestForm($bookTitle);
             }
         ?>
-            </div>
-        </main>
         <footer<?php if (!$bookTitle) { echo ' class="index"'; } ?>>
             <div class="container">
                 <div class="row">

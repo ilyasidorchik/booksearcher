@@ -95,9 +95,14 @@ HERE;
 HERE;
     }
 
-    function getHtmlWithBookDetails_SKBM($client, $xpath_SKBM, $bookI_SKBM) {
+    function getBookID_SKBM($xpath_SKBM, $bookI_SKBM) {
         $bookID_SKBM = $xpath_SKBM->query('//div[@id="searchrezult"]/div[@class="searchrez"][' . $bookI_SKBM . ']/@id')[0]->nodeValue;
         $bookID_SKBM = str_replace('\\\\\\\\', '\\', $bookID_SKBM);
+        return $bookID_SKBM;
+    }
+
+    function getHtmlWithBookDetails_SKBM($client, $xpath_SKBM, $bookI_SKBM) {
+        $bookID_SKBM = getBookID_SKBM($xpath_SKBM, $bookI_SKBM);
         $responseWithBookDetails_SKBM = $client->request('POST', 'http://skbm.nekrasovka.ru/request', [
             'form_params' => [
                 '_action' => 'execute',
@@ -119,6 +124,8 @@ HERE;
                 // Получение информации о книги с первой страницы
                 $ISBN = $xpathNormal->query("//span[@class='results_summary'][span='ISBN: ']/text()")[0]->nodeValue;
                 $ISBN = preg_replace("/[^0-9]/", '', $ISBN);
+                $callNumber = $xpathNormal->query("//*[@id='holdingst']/tbody/tr[1]/td[3]")[0]->nodeValue;
+                $callNumber = str_replace(['(Browse Shelf)', ' '], '', $callNumber);
 
                 // Получение информации о книги со страницы Марк-вью
                 $docMarc = new DOMDocument();
@@ -145,7 +152,8 @@ HERE;
             case 'СКБМ':
                 // ISBN
                 preg_match('/<ISBN:>\s+([\d-]+)/', $source, $matches);
-                $ISBN = preg_replace("/[^0-9]/", '', $matches[1]);
+                $ISBNWithDashes = $matches[1];
+                $ISBN = preg_replace("/[^0-9]/", '', $ISBNWithDashes);
 
                 // Название
                 preg_match('/к заглавию:> (.*)",\n"/', $source, $matches);
@@ -224,12 +232,14 @@ HERE;
 
         $bookInfo = [
             "ISBN" => $ISBN,
+            "ISBNWithDashes" => $ISBNWithDashes,
             "title" => $title,
             "titleTypografed" => $titleTypografed,
             "author" => $author,
             "publisher" => $publisher,
             "year" => $year,
-            "pages" => $pages
+            "pages" => $pages,
+            "callNumber" => $callNumber
         ];
 
         return $bookInfo;
@@ -262,11 +272,92 @@ HERE;
                     $availabilityOnHandsDate = str_replace('/', '.', $availabilityOnHandsDate);
                 }
 
-
                 // Формирование дива .libraryBooking о доступности
                 if ($availability > 0)  {
-                    $bookingButton = "<div class='libraryBookingButton'>
-                                            <button type='button' class='btn btn-outline-dark btn-sm' data-toggle='modal' data-target='#bookingForm'>Забронировать…</button>
+                    $date = date('l');
+                    $time = date('Hi');
+
+                    if ($date == 'Friday' && $time >= 2000 || $date == 'Saturday' || $date == 'Sunday' || $date == 'Monday') {
+                        // Следующий рабочий день — следующий вторник
+                        $nextWorkingDay = date('j.m', strtotime("next Tuesday"));
+
+                        // Определение последнего вторника в месяце — санитарного дня
+                        $month = date('m');
+                        $daysInMonth = date('t');
+                        $year = date('Y');
+                        for ($i = 1; $i <= $daysInMonth; $i++) {
+                            if (date('w', strtotime("$i.$month.$year")) == 2)
+                                $cleanupDay = $i;
+                        }
+                        $cleanupDay .= ".$month"; // для даты формата 31.01
+
+                        // Если следующий рабочий день — санитарный,
+                        // значит, действительный следующий рабочий день — после
+                        if ($nextWorkingDay == $cleanupDay)
+                            $nextWorkingDay = date('j.m', strtotime("next day $nextWorkingDay"));
+
+
+                        $nextWorkingDay = explode('.', $nextWorkingDay);
+                        switch ($nextWorkingDay[1]) {
+                            case '01':
+                                $nextWorkingDay[1] = 'января';
+                                break;
+                            case '02':
+                                $nextWorkingDay[1] = 'февраля';
+                                break;
+                            case '03':
+                                $nextWorkingDay[1] = 'марта';
+                                break;
+                            case '04':
+                                $nextWorkingDay[1] = 'апреля';
+                                break;
+                            case '05':
+                                $nextWorkingDay[1] = 'мая';
+                                break;
+                            case '06':
+                                $nextWorkingDay[1] = 'июня';
+                                break;
+                            case '07':
+                                $nextWorkingDay[1] = 'июля';
+                                break;
+                            case '08':
+                                $nextWorkingDay[1] = 'августа';
+                                break;
+                            case '09':
+                                $nextWorkingDay[1] = 'сентября';
+                                break;
+                            case '10':
+                                $nextWorkingDay[1] = 'октября';
+                                break;
+                            case '11':
+                                $nextWorkingDay[1] = 'ноября';
+                                break;
+                            case '12':
+                                $nextWorkingDay[1] = 'декабря';
+                                break;
+                        }
+
+                        $nextWorkingDay = "<br>на $nextWorkingDay[0] $nextWorkingDay[1]";
+
+
+                        $hint = "<div class='hint'>
+                                                    <div class='text'>
+                                                        <b>Почему нельзя забронировать раньше</b>";
+
+                        if ($date == 'Monday')
+                            $hint .= "<p>По понедельникам библиотека закрыта для читателей.</p>";
+                        else
+                            $hint .= "<p>1. Секретарь, который получает запросы на бронь, не работает по выходным.</p>
+                                      <p>2. По понедельникам библиотека закрыта для читателей.</p>";
+
+                        $hint .= "</div>
+                                </div>";
+
+                    }
+
+                    echo $bookingButton = "<div class='libraryBookingButton'>
+                                            <button type='button' class='btn btn-outline-dark btn-sm' data-toggle='modal' data-target='#bookingForm'>Забронировать".$nextWorkingDay."…</button>
+                                            $hint
                                         
                                             <div class='modal fade' id='bookingForm' tabindex='-1' role='dialog' aria-labelledby='bookingFormTitle' aria-hidden='true'>
                                                 <div class='modal-dialog modal-dialog-centered' role='document'>
@@ -277,7 +368,7 @@ HERE;
                                                                   <span aria-hidden='true'>&times;</span>
                                                                 </button>
                                                           </div>
-                                                          <form action='booked.php' method='POST' id='formBooking'>
+                                                          <form action='book.php' method='POST' id='formBooking'>
                                                               <div class='modal-body'>
                                                                     <div class='form-group'>
                                                                         <label for='email'>Ваша эл. почта</label>
@@ -294,16 +385,18 @@ HERE;
                                                                     <input type='hidden' name='publisher' value='$bookInfo_MGDB[publisher]'> 
                                                                     <input type='hidden' name='year' value='$bookInfo_MGDB[year]'>
                                                                     <input type='hidden' name='pages' value='$bookInfo_MGDB[pages]'>
+                                                                    <input type='hidden' name='callNumber' value='$bookInfo_MGDB[callNumber]'>
                                                                 </div>
                                                               <div class='modal-footer'>
-                                                                    <button name='toBook' class='btn btn-primary'>Забронировать</button>
+                                                                    <button name='toBook' class='btn btn-primary'>Забронировать$nextWorkingDay</button>
                                                               </div>
                                                           </form>
                                                     </div>
                                                     <div class='formProof alert alert-success' role='alert' style='display: none;'>
                                                         <h4 class='alert-heading'>Книга забронирована</h4>
-                                                        <p>В Деловую библиотеку отправлено письмо с просьбой забронировать книгу на фамилию <span id='surnameAdd'>$surname</span>. Почту регулярно проверяет секретарь, он передаст просьбу библиотекарю.</p>
-                                                        <p><i>Как забрать книгу.</i> Входите в библиотеку, идёте направо, говорите библиотекарю о броне, называете свою фамилию.</p>
+                                                        <p>В Деловую библиотеку отправлено письмо с просьбой забронировать книгу на фамилию <span id='surnameAdd'>$surname</span>.</p>
+                                                        <p>Почту регулярно проверяет секретарь, он передаст просьбу библиотекарю. Библиотекарь отложит книгу, но он может не написать вам&nbsp;об этом.</p>
+                                                        <p><i>Как забрать книгу.</i> Входите в библиотеку, идёте направо, говорите библиотекарю о брони, называете свою&nbsp;фамилию.</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -315,7 +408,8 @@ HERE;
                             $availabilityInfo .= 'а';
                             break;
                         case 2:case 3:case 4:
-                        $availabilityInfo .= 'и';
+                            $availabilityInfo .= 'и';
+                            break;
                     }
 
                     $availabilityInfo .= " для выдачи на дом";
@@ -429,9 +523,9 @@ HERE;
             array_push($arrayOfWasteBookI_SKBM, $page_SKBM . '_' . $bookI_SKBM);
 
             if ($bookInfo_MGDB[year] != $bookInfo_SKBM[year])
-                printLibs($client, $xpath_SKBM, $bookI_SKBM, $bookInfo_SKBM[year]);
+                printLibs($client, $xpath_SKBM, $bookI_SKBM, $bookInfo_SKBM[year], $bookInfo_SKBM);
             else
-                printLibs($client, $xpath_SKBM, $bookI_SKBM, '');
+                printLibs($client, $xpath_SKBM, $bookI_SKBM, '', $bookInfo_SKBM);
 
             // Вывод библиотек, в которых есть книга с $bookI_SKBM, и запись их индексов в массив, чтобы не выводить ещё раз
             $pageStart_SKBM = $page_SKBM;
@@ -486,9 +580,9 @@ HERE;
                         array_push($arrayOfWasteBookI_SKBM, $page_SKBM . '_' . $nextBookI_SKBM);
 
                         if ($bookInfo_MGDB[year] != $bookNextInfo_SKBM[year] && $bookInfo_SKBM[year] != $bookNextInfo_SKBM[year])
-                            printLibs($client, $xpath_SKBM, $nextBookI_SKBM, $bookNextInfo_SKBM[year]);
+                            printLibs($client, $xpath_SKBM, $nextBookI_SKBM, $bookNextInfo_SKBM[year], $bookInfo_SKBM);
                         else
-                            printLibs($client, $xpath_SKBM, $nextBookI_SKBM, '');
+                            printLibs($client, $xpath_SKBM, $nextBookI_SKBM, '', $bookInfo_SKBM);
                     }
                 }
             }
@@ -501,7 +595,7 @@ HERE;
         printBook($bookInfo_SKBM);
 
         array_push($arrayOfWasteBookI_SKBM, $page_SKBM . '_' . $bookI_SKBM);
-        printLibs($client, $xpath_SKBM, $bookI_SKBM, '');
+        printLibs($client, $xpath_SKBM, $bookI_SKBM, '', $bookInfo_SKBM);
 
         // Вывод библиотек, в которых есть книга с $bookI_SKBM, и запись их индексов в массив, чтобы не выводить ещё раз
         $pageStart_SKBM = $page_SKBM;
@@ -556,9 +650,9 @@ HERE;
                     array_push($arrayOfWasteBookI_SKBM, $page_SKBM . '_' . $nextBookI_SKBM);
 
                     if ($bookInfo_SKBM[year] != $bookNextInfo_SKBM[year])
-                        printLibs($client, $xpath_SKBM, $nextBookI_SKBM, $bookNextInfo_SKBM[year]);
+                        printLibs($client, $xpath_SKBM, $nextBookI_SKBM, $bookNextInfo_SKBM[year], $bookNextInfo_SKBM);
                     else
-                        printLibs($client, $xpath_SKBM, $nextBookI_SKBM, '');
+                        printLibs($client, $xpath_SKBM, $nextBookI_SKBM, '', $bookInfo_SKBM);
                 }
             }
         }
@@ -628,7 +722,7 @@ HERE;
             return true;
     }
 
-    function printLibs($client, $xpathSKBM, $bookI, $bookInfoYear) {
+    function printLibs($client, $xpathSKBM, $bookI, $bookInfoYear, $bookInfo_SKBM) {
         // Библиотечные системы у книги
         $librarySystemCount = $xpathSKBM->query('//div[@id="searchrezult"]/div[@class="searchrez"]['.$bookI.']//div[@class="level"]')->length;
         for ($librarySystemI = 1; $librarySystemI <= $librarySystemCount; $librarySystemI += 2) {
@@ -639,7 +733,7 @@ HERE;
             if ($libraryFullAddress) {
                 // Это библиотека-одиночка
                 $libraryAuthID = $xpathSKBM->query('//div[@id="searchrezult"]/div[@class="searchrez"]['.$bookI.']//div[@class="level"]['.$librarySystemI.']/div[@class="row"][1]/div[@class="td w30 p5x"]/input[@class="authid"]/@value')[0]->nodeValue;
-                printLib($libraryName, $libraryFullAddress, $libraryAuthID, $client, $bookInfoYear);
+                printLib($libraryName, $libraryFullAddress, $libraryAuthID, $client, $bookInfoYear, $bookInfo_SKBM);
             }
             else {
                 // Это библиотека-система
@@ -651,13 +745,13 @@ HERE;
                     $libraryName = $xpathSKBM->query('//div[@id="searchrezult"]/div[@class="searchrez"]['.$bookI.']//div[@class="level"]['.$librarySystemContentI.']/div[@class="row"]['.$i.']/div[@class="td loc"][1]//b')[0]->nodeValue;
                     $libraryFullAddress = $xpathSKBM->query('///div[@id="searchrezult"]/div[@class="searchrez"]['.$bookI.']//div[@class="level"]['.$librarySystemContentI.']/div[@class="row"]['.$i.']/div[@class="td loc"][1]/p[2]')[0]->nodeValue;
                     $libraryAuthID = $xpathSKBM->query('//div[@id="searchrezult"]/div[@class="searchrez"]['.$bookI.']//div[@class="level"]['.$librarySystemContentI.']/div[@class="row"]['.$i.']/div[@class="td w30 p5x"]/input[@class="authid"]/@value')[0]->nodeValue;
-                    printLib($libraryName, $libraryFullAddress, $libraryAuthID, $client, $bookInfoYear);
+                    printLib($libraryName, $libraryFullAddress, $libraryAuthID, $client, $bookInfoYear, $bookInfo_SKBM);
                 }
             }
         }
     }
 
-    function printLib($libraryName, $libraryFullAddress, $libraryAuthID, $client, $bookInfoYear) {
+    function printLib($libraryName, $libraryFullAddress, $libraryAuthID, $client, $bookInfoYear, $bookInfo_SKBM) {
         // Отказ в печати библиотек, которые не выдают книги на дом взрослым
         if (strpos($libraryName, 'Детская') !== false || strpos($libraryName, 'детская') !== false || strpos($libraryName, 'читальня') !== false)
             return false;
@@ -722,8 +816,69 @@ HERE;
         if (!$libraryAddress)
             $libraryAddress = '&nbsp;';
 
+
+        if ($libraryName == 'Библиотека Некрасова') {
+            $libraryBooking = getBookAvailabilityInNekrasovka($client, $bookInfo_SKBM);
+            $libraryBookingText = $libraryBooking[availabilityInfoText];
+            $callNumber = $libraryBooking[callNumber];
+
+            if (strpos($libraryBookingText,'для выдачи на дом') !== false)
+                $libraryBookingButton = "<div class='libraryBookingButton'>
+                                            <button type='button' class='btn btn-outline-dark' data-toggle='modal' data-target='#bookingForm$bookInfo_SKBM[ISBN]'>Забронировать…</button>
+                                                                                    
+                                            <div class='modal fade' id='bookingForm$bookInfo_SKBM[ISBN]' tabindex='-1' role='dialog' aria-labelledby='bookingFormTitle' aria-hidden='true'>
+                                                <div class='modal-dialog modal-dialog-centered' role='document'>
+                                                    <div class='modal-content formBooking'>
+                                                          <div class='modal-header'>
+                                                                <h5 class='modal-title' id='exampleModalCenterTitle'>Бронирование книги</h5>
+                                                                <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+                                                                  <span aria-hidden='true'>&times;</span>
+                                                                </button>
+                                                          </div>
+                                                          <form>
+                                                              <div class='modal-body'>
+                                                                    <div class='form-group'>
+                                                                        <label for='email$bookInfo_SKBM[ISBN]'>Ваша эл. почта</label>
+                                                                        <input type='email' name='email' class='form-control' id='email$bookInfo_SKBM[ISBN]' aria-describedby='emailHelp$bookInfo_SKBM[ISBN]' required>
+                                                                        <small id='emailHelp$bookInfo_SKBM[ISBN]' class='form-text text-muted'>Библиотекарь подтвердит бронь или напишет в случае чего</small>
+                                                                    </div>
+                                                                    <div class='form-group'>
+                                                                        <label for='surname$bookInfo_SKBM[ISBN]'>Ваша фамилия</label>
+                                                                        <input type='text' name='surname' class='form-control' id='surname$bookInfo_SKBM[ISBN]' aria-describedby='surnameHelp$bookInfo_SKBM[ISBN]' required>
+                                                                        <small id='surnameHelp$bookInfo_SKBM[ISBN]' class='form-text text-muted'>Назовёте в библиотеке</small>
+                                                                    </div>
+                                                                    <input type='hidden' name='title' value='$bookInfo_SKBM[title]'>
+                                                                    <input type='hidden' name='author' value='$bookInfo_SKBM[author]'>
+                                                                    <input type='hidden' name='publisher' value='$bookInfo_SKBM[publisher]'>
+                                                                    <input type='hidden' name='year' value='$bookInfo_SKBM[year]'>
+                                                                    <input type='hidden' name='pages' value='$bookInfo_SKBM[pages]'>
+                                                                    <input type='hidden' name='callNumber' value='$callNumber'>
+                                                                </div>
+                                                              <div class='modal-footer'>
+                                                                    <input type='button' class='btn btn-primary' value='Забронировать'>
+                                                              </div>
+                                                          </form>
+                                                    </div>
+                                                    <div class='formProof alert alert-success' role='alert' style='display: none;'>
+                                                        <h4 class='alert-heading'>Книга будет забронирована</h4>
+                                                        <p>В библиотеку Некрасова отправлено письмо с просьбой забронировать книгу на фамилию <span class='surnameAdd'>$surname</span>.</p>
+                                                        <p>Почту регулярно проверяют библиотекари, они отложат книгу и напишут&nbsp;вам.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                      </div>";
+
+
+        }
+
         if ($bookInfoYear)
-            $libraryBooking = "<div class='libraryBooking'>Книга издана в&nbsp;$bookInfoYear</div>";
+            $bookInfoYear = "<div class='libraryBookOtherYear'>$bookInfoYear</div>";
+
+        $libraryBooking = "<div class='libraryBooking'>
+                               $libraryBookingButton
+                               <div class='libraryBookingText'>$libraryBookingText</div>
+                               $bookInfoYear
+                           </div>";
 
         $libraryInfo = [
             "name" => $libraryNameTypografed,
@@ -751,6 +906,143 @@ HERE;
                 </div>
             </div>
 HERE;
+    }
+
+    function getBookAvailabilityInNekrasovka($client, $bookInfo_SKBM) {
+        $ISBNWithDashed = $bookInfo_SKBM[ISBNWithDashes];
+
+        $response = $client->request('POST', 'http://opac.nekrasovka.ru/request', [
+            'form_params' => [
+                '_action' => 'php',
+                '_errorhtml' => 'error1',
+                '_handler' => 'search/search.php',
+                'querylist' => '<_service>STORAGE:opacfindd:FindView[separator]<_version>2.5.0[separator]<session>1450305[separator]<_start>0[separator]<start>0[separator]<$length>15[separator]<length>15[separator]<_showstr><i>Везде</i> ' . $ISBNWithDashed . '[separator]<_str>[bracket]AH ' . $ISBNWithDashed . '[/bracket][separator]<$outform>SHOTWEB[separator]<outformList[0]/outform>SHOTWEB[separator]<outformList[1]/outform>LINEORD[separator]<iddb>988[separator]<query/body>(AH ' . $ISBNWithDashed . ')[separator]<userId>IGUES[separator]<level[0]>Full[separator]<level[1]>Retro[separator]<_iddb>988[separator]<$typework>search',
+                '_numsean' => '1450305'
+            ]
+        ]);
+        $html = $response->getBody();
+
+        $doc = new DOMDocument();
+        @$doc->loadHTML($html);
+        $xpath_SKBM = new DOMXpath($doc);
+
+        $bookID_SKBM = getBookID_SKBM($xpath_SKBM, 1);
+        if (stripos($bookID_SKBM, '-') !== false)
+            $bookID_SKBM = getBookID_SKBM($xpath_SKBM, 2);
+        $bookID_SKBM = str_replace('\\\\', '\\', $bookID_SKBM);
+
+        $availabilityResponse = $client->request('POST', 'http://opac.nekrasovka.ru/request', [
+            'form_params' => [
+                '_action' => 'execute',
+                '_html' => 'stat',
+                '_errorhtml' => 'error',
+                'querylist' => '<_service>STORAGE:opacholdd:MoveCopies[separator]<_version>1.1.0[separator]<session>1450305[separator]<iddb>5[separator]<idbr>' . $bookID_SKBM . '[separator]<copyform>SEE7BB[separator]<writeoff>false[separator]<userId>IGUES'
+            ]
+        ]);
+        $availabilityResponse = $availabilityResponse->getBody();
+
+
+        $booksCount = preg_match_all('/_permanentLocation: "(.*?)"/', $availabilityResponse, $matches);
+        $booksForHome = 0;
+        $availability = 0;
+        preg_match_all('/_status: "(.*?)"/', $availabilityResponse, $matchesStatus);
+        for ($i = 0; $i < $booksCount; $i++) {
+            if (strpos($matches[1][$i], 'ЧЗ') === false && strpos($matches[1][$i], 'чз') === false && strpos($matches[1][$i], 'РФ') === false && strpos($matches[1][$i], 'рф') === false && strpos($matches[1][$i], 'НЕТ ДАННЫХ') === false) {
+                $booksForHome++;
+                if ($matchesStatus[1][$i] == 1)
+                    $availability++;
+            }
+        }
+
+        if ($availability) {
+            preg_match('/Шифр: \[\/b\](.*?)\[br\]/', $availabilityResponse, $matchesCallNumber);
+            $callNumber = $matchesCallNumber[1];
+
+            $availabilityInfo = "$availability книг";
+
+            switch ($availability) {
+                case 1:
+                    $availabilityInfo .= 'а';
+                    break;
+                case 2:case 3:case 4:
+                    $availabilityInfo .= 'и';
+                    break;
+            }
+
+            $availabilityInfo .= ' для выдачи на дом';
+
+            if ($booksForHome > $availability) {
+                $otherBooksForHome = $booksForHome - $availability;
+
+                $availabilityInfo .= ",<br>на руках";
+
+                $availabilityInfo .= " $otherBooksForHome книг";
+
+                switch ($otherBooksForHome) {
+                    case 1:
+                        $availabilityInfo .= 'а';
+                        break;
+                    case 2:case 3:case 4:
+                        $availabilityInfo .= 'и';
+                        break;
+                }
+
+                $dates = array();
+                $booksCount = preg_match_all('/_location: "(.*?)"/', $availabilityResponse, $matches);
+                for ($i = 0; $i < $booksCount; $i++) {
+                    if (stristr($matches[1][$i], 'В хранении') == false) {
+                        $date = str_replace('На руках до', '', $matches[1][$i]);
+
+                        if (stristr($matches[1][$i], ' - ') == false) {
+                            array_push($dates, $date);
+                        }
+                    }
+                }
+
+                $availabilityInfo .= ' до ';
+                foreach ($dates as $date) {
+                    $availabilityInfo .= $date . ', ';
+                }
+                if (substr($availabilityInfo, -2) == ', ')
+                    $availabilityInfo = substr($availabilityInfo, 0, -2);
+            }
+        }
+        else {
+            if ($booksForHome) {
+                $availabilityInfo = "На руках";
+
+                if ($booksForHome > 1) {
+                    $availabilityInfo .= " $booksForHome книг";
+                    switch ($booksForHome) {
+                        case 2:case 3:case 4:
+                            $availabilityInfo .= 'и';
+                            break;
+                    }
+                }
+
+                $availabilityInfo .= ' до ';
+
+                $dates = array();
+                $booksCount = preg_match_all('/_location: "(.*?)"/', $availabilityResponse, $matches);
+                for ($i = 0; $i < $booksCount; $i++) {
+                    $date = str_replace('На руках до', '', $matches[1][$i]);
+                    array_push($dates, $date);
+                }
+
+                foreach ($dates as $date) {
+                    $availabilityInfo .= $date . ', ';
+                }
+                $availabilityInfo = substr($availabilityInfo, 0, -2);
+            } else
+                $availabilityInfo = 'Книги нет';
+        }
+
+        $availabilityInfo = [
+            'availabilityInfoText' => $availabilityInfo,
+            'callNumber' => $callNumber
+        ];
+
+        return $availabilityInfo;
     }
 
     function findAddressWithMetro($libraryFullAddress) {
@@ -852,10 +1144,11 @@ HERE;
         return $strTypografed;
     }
 
-    function sendEmailForBooking($email, $surname, $title, $author, $publisher, $year) {
+    function sendEmailForBooking($email, $surname, $title, $author, $publisher, $year, $callNumber) {
         $titleQuoted = '«' . $title . '»';
 
-        // $to = 'off@nekrasovka.ru'; // для продакшена
+        // $to = 'mgdb@culture.mos.ru'; // для продакшена
+        // $to = 'abonement@nekrasovka.ru'; // для продакшена
         $to = 'ilya@sidorchik.ru';
         $title = "Бронирование книги $titleQuoted";
         $headers  = 'MIME-Version: 1.0' . "\r\n";
@@ -873,9 +1166,8 @@ HERE;
 					<body>
 					    <p>Здравствуйте!</p>
 							
-						<p>Отложите для меня, пожалуйста, книгу ' . $titleTypografed . ': автор ' . $author . ', издательство «' . $publisher . '», год выпуска ' . $year . '.</p>
-							
-						<p>Моя фамилия — ' . $surname . '.</p>
+						<p>В вашей библиотеке есть книга ' . $titleTypografed . ': автор ' . $author . ', издательство «' . $publisher . '», год выпуска ' . $year . ', шифр ' . $callNumber . '.</p>
+						<p>Я проверил: книга выдаётся на дом, сейчас не на руках. Пожалуйста, отложите её для меня. Моя фамилия — ' . $surname . '.</p>
 					</body>
 				</html>';
 
@@ -901,7 +1193,7 @@ HERE;
 	                    <title>'. $title .'</title>
 					</head>
 					<body><p>Здравствуйте!</p>
-							<p>Я хотел бы прочитать книгу ' . $titleTypografed . ' автора ' . $author . ', но этой книги нет ни в одной московской библиотеке для выдачи на дом. Пожалуйста, приобретите её.</p>
+							<p> Я хотел бы прочитать книгу ' . $titleTypografed . ' автора ' . $author . ', но этой книги нет ни в одной московской библиотеке для выдачи на дом. Пожалуйста, приобретите её.</p>
 					</body>
 				</html>';
 
