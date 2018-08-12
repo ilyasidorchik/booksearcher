@@ -313,9 +313,13 @@ nav {
                 &Button {
                     padding-left: 8px;
 
-                    button {
+                    > button, button[disabled], input[type='button'] {
                         margin-top: -3px;
                         padding: .05rem .75rem;
+                    }
+
+                    .formProof {
+                        display: none;
                     }
                 }
             }

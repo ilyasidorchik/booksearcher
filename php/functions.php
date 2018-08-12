@@ -35,15 +35,15 @@ HERE;
                             </div>  
                             <div class="row">
                                 <div class="col-sm-12 col-md-7 col-lg-5 offset-lg-1 col-xl-4 offset-xl-2">     
-                                    <form enctype="multipart/form-data" method="POST" class="form" id="form">
+                                    <form class="form">
                                         <div class="modal-header">
                                             <h5 class="modal-title" id="exampleModalCenterTitle">Запрос книги</h5>
                                         </div>
                                         <div class="modal-body">
-                                            <input type="hidden" name="title" value='$bookTitle'>
+                                            <input type="hidden" name="title" id='title' value='$bookTitle'>
                                             <div class="form-group">
                                                 <label for="author">Автор</label>
-                                                <input type="text" class="form-control" id="author" name="author" aria-describedby="authorHelp" required>
+                                                <input type="text" name="author" class="form-control" id="author" aria-describedby="authorHelp" required>
                                                 <small id="authorHelp" class="form-text text-muted">Чтобы не подумали о другой книге</small>
                                             </div>
 HERE;
@@ -61,25 +61,30 @@ HERE;
             echo <<<HERE
                                             <div class="form-group">
                                                 <label for="email">Ваша эл. почта</label>
-                                                <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" required>
+                                                <input type="email" name="email" class="form-control" id="email" aria-describedby="emailHelp" required>
                                                 <small id="emailHelp" class="form-text text-muted">Библиотекарь напишет в случае чего</small>
                                             </div>
                                             <div class="form-group">
                                                 <label for="surname">Ваша фамилия</label>
-                                                <input type="text" class="form-control" id="surname" name="surname" aria-describedby="surnameHelp" required>
+                                                <input type="text" name="surname" class="form-control" id="surname" aria-describedby="surnameHelp" required>
                                                 <small id="surnameHelp" class="form-text text-muted">Для связи с библиотекарем</small>
                                             </div>
 HERE;
         }
-        else
+        else {
             $email = $row['email'];
+            $surname = $row['surname'];
+
+            echo "<input type='hidden' name='email' id='email' value='$email'>
+                  <input type='hidden' name='surname' id='surname' value='$surname'>";
+        }
 
         $title = typograf('«' . $bookTitle . '»');
         
         echo <<<HERE
                                         </div>
                                         <div class="modal-footer">
-                                            <input type="submit" name="toRequest" value="Запросить" class="btn btn-primary" id="submit">
+                                            <input type="button" class="btn btn-primary" id="toRequest" value="Запросить">
                                         </div>
                                     </form>
                                     <div class="formProof alert alert-success" role="alert" style="display: none;">
@@ -822,9 +827,34 @@ HERE;
             $libraryBookingText = $libraryBooking[availabilityInfoText];
             $callNumber = $libraryBooking[callNumber];
 
-            if (strpos($libraryBookingText,'для выдачи на дом') !== false)
-                $libraryBookingButton = "<div class='libraryBookingButton'>
-                                            <button type='button' class='btn btn-outline-dark' data-toggle='modal' data-target='#bookingForm$bookInfo_SKBM[ISBN]'>Забронировать…</button>
+            if (strpos($libraryBookingText,'для выдачи на дом') !== false) {
+                // Если в учётной записи есть почта — бронирование книги в один клик
+                $encryption = $_COOKIE["encryption"];
+                // Подключение к базе данных
+                include 'php/db_connection.php';
+                $link = mysqli_connect($host, $user, $password, $database) or die("Ошибка");
+                mysqli_set_charset($link, 'utf8');
+                $result = mysqli_query($link, "SELECT * FROM readers WHERE encryption = '$encryption'");
+                $row = mysqli_fetch_assoc($result);
+
+                if ($row['email'])  {
+                    $libraryBookingButton = "<form class='formBooking'>
+                                                <input type='hidden' name='email' value='$row[email]'>
+                                                <input type='hidden' name='surname' value='$row[surname]'>
+                                                <input type='hidden' name='titleBooking' value='$bookInfo_SKBM[title]'>
+                                                <input type='hidden' name='author' value='$bookInfo_SKBM[author]'>
+                                                <input type='hidden' name='publisher' value='$bookInfo_SKBM[publisher]'> 
+                                                <input type='hidden' name='year' value='$bookInfo_SKBM[year]'>
+                                                <input type='hidden' name='pages' value='$bookInfo_SKBM[pages]'>
+                                                <input type='hidden' name='callNumber' value='$callNumber'>
+                                                <input type='button' class='btn btn-outline-dark' value='Забронировать'>
+                                            </form>
+                                            <div class='formProof' style='display: none;'>
+                                                <button class='btn btn-success' disabled>Забронировано</button>
+                                            </div>";
+                }
+                else {
+                    $libraryBookingButton = "<button type='button' class='btn btn-outline-dark' data-toggle='modal' data-target='#bookingForm$bookInfo_SKBM[ISBN]'>Забронировать…</button>
                                                                                     
                                             <div class='modal fade' id='bookingForm$bookInfo_SKBM[ISBN]' tabindex='-1' role='dialog' aria-labelledby='bookingFormTitle' aria-hidden='true'>
                                                 <div class='modal-dialog modal-dialog-centered' role='document'>
@@ -847,7 +877,7 @@ HERE;
                                                                         <input type='text' name='surname' class='form-control' id='surname$bookInfo_SKBM[ISBN]' aria-describedby='surnameHelp$bookInfo_SKBM[ISBN]' required>
                                                                         <small id='surnameHelp$bookInfo_SKBM[ISBN]' class='form-text text-muted'>Назовёте в библиотеке</small>
                                                                     </div>
-                                                                    <input type='hidden' name='title' value='$bookInfo_SKBM[title]'>
+                                                                    <input type='hidden' name='titleBooking' value='$bookInfo_SKBM[title]'>
                                                                     <input type='hidden' name='author' value='$bookInfo_SKBM[author]'>
                                                                     <input type='hidden' name='publisher' value='$bookInfo_SKBM[publisher]'>
                                                                     <input type='hidden' name='year' value='$bookInfo_SKBM[year]'>
@@ -865,8 +895,12 @@ HERE;
                                                         <p>Почту регулярно проверяют библиотекари, они отложат книгу и напишут&nbsp;вам.</p>
                                                     </div>
                                                 </div>
-                                            </div>
-                                      </div>";
+                                            </div>";
+                }
+
+
+                $libraryBookingButton = "<div class='libraryBookingButton'>$libraryBookingButton</div>";
+            }
 
 
         }
