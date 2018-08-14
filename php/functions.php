@@ -854,9 +854,82 @@ HERE;
                                             </div>";
                 }
                 else {
-                    $libraryBookingButton = "<button type='button' class='btn btn-outline-dark' data-toggle='modal' data-target='#bookingForm$bookInfo_SKBM[ISBN]'>Забронировать…</button>
-                                                                                    
-                                            <div class='modal fade' id='bookingForm$bookInfo_SKBM[ISBN]' tabindex='-1' role='dialog' aria-labelledby='bookingFormTitle' aria-hidden='true'>
+                    $titleQuotedTypografed = typograf('«' . $bookInfo_SKBM[title] . '»');
+                    $publisherQuotedTypografed = typograf('«' . $bookInfo_SKBM[publisher] . '»');
+
+                    $libraryBookingButton = "<button type='button' class='btn btn-outline-dark' data-toggle='modal' data-target='#deliveryForm$bookInfo_SKBM[ISBN]'>Доставить…</button>
+                                             <div class='modal fade' id='deliveryForm$bookInfo_SKBM[ISBN]' tabindex='-1' role='dialog' aria-labelledby='bookingFormTitle' aria-hidden='true'>
+                                                <div class='modal-dialog modal-dialog-centered' role='document'>
+                                                    <div class='modal-content formBooking'>
+                                                          <div class='modal-header'>
+                                                                <h5 class='modal-title' id='exampleModalCenterTitle'>Доставка книг из библиотеки Некрасова</h5>
+                                                                <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+                                                                  <span aria-hidden='true'>&times;</span>
+                                                                </button>
+                                                          </div>
+                                                          <form>
+                                                              <div class='modal-body' style='padding-bottom: 0;'>
+                                                                    <div class='delivery'>
+                                                                        <div class='deliveryOrder'>
+                                                                            <p>
+                                                                                <b>Для кого</b><br>
+                                                                                Для жителей Москвы, у которых есть читательский билет Некрасовки.
+                                                                            </p>
+                                                                            <p>
+                                                                                <b>Как заказать</b><br>
+                                                                                Вы пишете мне в Телеграме <a href='https://t.me/ilyasidorchik' class='static'>@ilyasidorchik</a>: копируете нижеприведённый текст, дописываете время, место встречи и фотографируете штрихкод на задней стороне читательского.
+                                                                            </p>
+                                                                            <div class='deliveryOrderTemplate'>
+                                                                                <p>
+                                                                                    Илья, привет!
+                                                                                </p>
+                                                                                <p>
+                                                                                    Привези книгу $titleQuotedTypografed: автор $bookInfo_SKBM[author], издательство $publisherQuotedTypografed, год выпуска $bookInfo_SKBM[year].
+                                                                                </p>
+                                                                                <p>
+                                                                                    Давай встретимся сегодня в 20:00 по адресу: Декабристов, 35, подъезд 1, домофон #3501, этаж 7.
+                                                                                </p>
+                                                                                <p>
+                                                                                    Мой читательский:
+                                                                                </p>
+                                                                            </div>
+                                                                            <p>
+                                                                                <b>Сколько стоит</b><br>
+                                                                                69 ₽. Дешевле, чем дорога в библиотеку.
+                                                                            </p>
+                                                                            <p>
+                                                                                <b>Когда и как оплатить</b><br>
+                                                                                При получении книжки. Как вам удобно: наличными или переводом на карту (Сбербанка, Тинькоффа или Рокета).
+                                                                            </p>
+                                                                        </div>
+                                                                        <div class='deliveryMan'>
+                                                                            <div class='deliveryManPhoto'>
+                                                                                <img src='img/ilya-sidorchik.png'>
+                                                                            </div>
+                                                                            <div class='deliveryManText'>
+                                                                                <p>
+                                                                                    <b>Кто доставит</b><br>
+                                                                                    <a href='http://sidorchik.ru' class='static'>Илья&nbsp;Сидорчик</a>. Я сделал этот сайт и доставлю вам книгу.
+                                                                                </p>
+                                                                                <p>
+                                                                                    <b>Сколько книг</b><br>
+                                                                                    Можно заказать до 5 книг. Это не влияет на цену.
+                                                                                </p>
+                                                                                <p>
+                                                                                    <b>Можно вернуть</b><br>
+                                                                                    Когда прочитаете книгу, я верну её в библиотеку тоже за 69 ₽.
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                              </div>
+                                                          </form>
+                                                    </div>
+                                                </div>
+                                             </div>
+                                             
+                                             <button type='button' class='btn btn-outline-dark' data-toggle='modal' data-target='#bookingForm$bookInfo_SKBM[ISBN]'>Забронировать…</button>                             
+                                             <div class='modal fade' id='bookingForm$bookInfo_SKBM[ISBN]' tabindex='-1' role='dialog' aria-labelledby='bookingFormTitle' aria-hidden='true'>
                                                 <div class='modal-dialog modal-dialog-centered' role='document'>
                                                     <div class='modal-content formBooking'>
                                                           <div class='modal-header'>
@@ -895,7 +968,7 @@ HERE;
                                                         <p>Почту регулярно проверяют библиотекари, они отложат книгу и напишут&nbsp;вам.</p>
                                                     </div>
                                                 </div>
-                                            </div>";
+                                             </div>";
                 }
 
 

@@ -4,7 +4,7 @@ function start() {
     let requestButton = document.getElementById('toRequest');
     if (requestButton != null)
         requestButton.addEventListener('click', toRequest);
-    
+
     let bookingButtons = document.querySelectorAll('input[value="Забронировать"]');
     if (bookingButtons.length > 0) {
         for (var i = 0; i < bookingButtons.length; i++) {
