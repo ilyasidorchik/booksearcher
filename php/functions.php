@@ -838,7 +838,82 @@ HERE;
                 $row = mysqli_fetch_assoc($result);
 
                 if ($row['email'])  {
-                    $libraryBookingButton = "<form class='formBooking'>
+                    $titleQuotedTypografed = typograf('«' . $bookInfo_SKBM[title] . '»');
+                    $publisherQuotedTypografed = typograf('«' . $bookInfo_SKBM[publisher] . '»');
+
+                    $libraryBookingButton = "<button class='btn btn-outline-dark' data-toggle='modal' data-target='#deliveryForm$bookInfo_SKBM[ISBN]'>Доставить…</button>
+                                             <div class='modal fade' id='deliveryForm$bookInfo_SKBM[ISBN]' tabindex='-1' role='dialog' aria-labelledby='bookingFormTitle' aria-hidden='true'>
+                                                <div class='modal-dialog modal-dialog-centered' role='document'>
+                                                    <div class='modal-content formBooking'>
+                                                          <div class='modal-header'>
+                                                                <h5 class='modal-title' id='exampleModalCenterTitle'>Доставка книг из библиотеки Некрасова</h5>
+                                                                <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+                                                                  <span aria-hidden='true'>&times;</span>
+                                                                </button>
+                                                          </div>
+                                                          <form>
+                                                              <div class='modal-body' style='padding-bottom: 0;'>
+                                                                    <div class='delivery'>
+                                                                        <div class='deliveryOrder'>
+                                                                            <p>
+                                                                                <b>Для кого</b><br>
+                                                                                Для жителей Москвы, у которых есть читательский билет Некрасовки.
+                                                                            </p>
+                                                                            <p>
+                                                                                <b>Как заказать</b><br>
+                                                                                Вы пишете мне в Телеграме <a href='https://t.me/ilyasidorchik' class='static'>@ilyasidorchik</a>: копируете нижеприведённый текст, дописываете время, место встречи и фотографируете штрихкод на задней стороне читательского.
+                                                                            </p>
+                                                                            <div class='deliveryOrderTemplate'>
+                                                                                <p>
+                                                                                    Илья, привет!
+                                                                                </p>
+                                                                                <p>
+                                                                                    Привези книгу $titleQuotedTypografed: автор $bookInfo_SKBM[author], издательство $publisherQuotedTypografed, год выпуска $bookInfo_SKBM[year].
+                                                                                </p>
+                                                                                <p>
+                                                                                    Давай встретимся сегодня в 20:00 по адресу: Декабристов, 35, подъезд 1, домофон #3501, этаж 7.
+                                                                                </p>
+                                                                                <p>
+                                                                                    Мой читательский:
+                                                                                </p>
+                                                                            </div>
+                                                                            <p>
+                                                                                <b>Сколько стоит</b><br>
+                                                                                69 ₽. Дешевле, чем дорога в библиотеку.
+                                                                                <br>Успейте, пока цена не поднялась.
+                                                                            </p>
+                                                                            <p>
+                                                                                <b>Когда и как оплатить</b><br>
+                                                                                При получении книжки. Как вам удобно: наличными или переводом на карту (Сбербанка, Тинькоффа или Рокета).
+                                                                            </p>
+                                                                        </div>
+                                                                        <div class='deliveryMan'>
+                                                                            <div class='deliveryManPhoto'>
+                                                                                <img src='img/ilya-sidorchik.png'>
+                                                                            </div>
+                                                                            <div class='deliveryManText'>
+                                                                                <p>
+                                                                                    <b>Кто доставит</b><br>
+                                                                                    Я, <a href='http://sidorchik.ru' class='static'>Илья&nbsp;Сидорчик</a>, создатель этого сайта.
+                                                                                </p>
+                                                                                <p>
+                                                                                    <b>Сколько книг</b><br>
+                                                                                    Можно заказать до 5 книг. Это<br>не влияет на цену.
+                                                                                </p>
+                                                                                <p>
+                                                                                    <b>Можно вернуть</b><br>
+                                                                                    Когда прочитаете<br>книгу, я&nbsp;верну её<br>в&nbsp;библиотеку.<br>Тоже за&nbsp;69&nbsp;₽.
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                              </div>
+                                                          </form>
+                                                    </div>
+                                                </div>
+                                             </div>";
+
+                    $libraryBookingButton .= "<form class='formBooking'>
                                                 <input type='hidden' name='email' value='$row[email]'>
                                                 <input type='hidden' name='surname' value='$row[surname]'>
                                                 <input type='hidden' name='titleBooking' value='$bookInfo_SKBM[title]'>
@@ -857,7 +932,7 @@ HERE;
                     $titleQuotedTypografed = typograf('«' . $bookInfo_SKBM[title] . '»');
                     $publisherQuotedTypografed = typograf('«' . $bookInfo_SKBM[publisher] . '»');
 
-                    $libraryBookingButton = "<button type='button' class='btn btn-outline-dark' data-toggle='modal' data-target='#deliveryForm$bookInfo_SKBM[ISBN]'>Доставить…</button>
+                    $libraryBookingButton = "<button class='btn btn-outline-dark' data-toggle='modal' data-target='#deliveryForm$bookInfo_SKBM[ISBN]'>Доставить…</button>
                                              <div class='modal fade' id='deliveryForm$bookInfo_SKBM[ISBN]' tabindex='-1' role='dialog' aria-labelledby='bookingFormTitle' aria-hidden='true'>
                                                 <div class='modal-dialog modal-dialog-centered' role='document'>
                                                     <div class='modal-content formBooking'>

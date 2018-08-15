@@ -267,7 +267,7 @@ nav {
             position: relative;
             display: flex;
             justify-content: space-between;
-            padding: 10px 10px 20px;
+            padding: 10px 10px 15px;
             background: #f0f0f0;
             border-bottom: 1px solid rgba(0,0,0,.08);
 
@@ -300,21 +300,13 @@ nav {
                 align-items: flex-end;
                 max-width: 300px;
 
-                &Text {
-                    text-align: right;
-
-                    .availabilityAtHome.comma {
-                        &::after {
-                            content: ',';
-                        }
-                    }
-                }
-
                 &Button {
+                    display: flex;
+
                     padding-left: 8px;
 
                     > button:first-of-type {
-                        margin-right: 1px;
+                        margin-right: 4px;
                     }
 
                     > button, button[disabled], input[type='button'] {
@@ -326,6 +318,18 @@ nav {
                         display: none;
                     }
                 }
+
+                &Text {
+                    margin-top: -2px;
+                    text-align: right;
+
+                    .availabilityAtHome.comma {
+                        &::after {
+                            content: ',';
+                        }
+                    }
+                }
+
             }
 
             .delivery {
