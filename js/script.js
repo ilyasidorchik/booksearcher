@@ -40,31 +40,47 @@ function toRequest() {
 }
 
 function toBook(e) {
-    let email = document.getElementsByName('email')[this.number].value;
-    let surname = document.getElementsByName('surname')[this.number].value;
-    let title = document.getElementsByName('titleBooking')[this.number].value;
-    let author = document.getElementsByName('author')[this.number].value;
-    let publisher = document.getElementsByName('publisher')[this.number].value;
-    let year = document.getElementsByName('year')[this.number].value;
-    let pages = document.getElementsByName('pages')[this.number].value;
-    let callNumber = document.getElementsByName('callNumber')[this.number].value;
-    let params = 'email=' + email + '&surname=' + surname + '&title=' + title + '&author=' + author + '&publisher=' + publisher + '&year=' + year + '&pages=' + pages + '&callNumber=' + callNumber;
+    let email = document.getElementsByName('email')[this.number];
+    let surname = document.getElementsByName('surname')[this.number];
 
-    let xhr = new XMLHttpRequest();
-    xhr.open('POST', 'php/book.php'); // определяем тип запроса и ссылку на обработчик запроса
-    xhr.timeout = 5000; // таймаут запроса в мс
-    xhr.ontimeout=()=>{alert('Превышено время ожидания ответа от сервера!')};
-    xhr.onreadystatechange=()=>{ // когда меняется статус запроса, вызываем функцию
-        if (xhr.readyState === 4){ // если статус 4 (завершено)
-            if (xhr.status === 200) { // если код ответа сервера 200, получить ответ
-                document.querySelectorAll('.formBooking')[this.number].style.display = 'none';
-                document.querySelectorAll('.formProof')[this.number].style.display = 'block';
+    if ((email.value == '') || (email.value.match(/.+@.+\..+/i) == null)) {
+        email.focus();
+        email.classList.add("invalid");
+    }
+    else if (surname.value == '') {
+        email.classList.remove("invalid");
+        surname.focus();
+        surname.classList.add("invalid");
+    }
+    else {
+        surname.classList.remove("invalid");
+
+        email = email.value;
+        surname = surname.value;
+        let title = document.getElementsByName('titleBooking')[this.number].value;
+        let author = document.getElementsByName('author')[this.number].value;
+        let publisher = document.getElementsByName('publisher')[this.number].value;
+        let year = document.getElementsByName('year')[this.number].value;
+        let pages = document.getElementsByName('pages')[this.number].value;
+        let callNumber = document.getElementsByName('callNumber')[this.number].value;
+        let params = 'email=' + email + '&surname=' + surname + '&title=' + title + '&author=' + author + '&publisher=' + publisher + '&year=' + year + '&pages=' + pages + '&callNumber=' + callNumber;
+
+        let xhr = new XMLHttpRequest();
+        xhr.open('POST', 'php/book.php'); // определяем тип запроса и ссылку на обработчик запроса
+        xhr.timeout = 5000; // таймаут запроса в мс
+        xhr.ontimeout=()=>{alert('Превышено время ожидания ответа от сервера!')};
+        xhr.onreadystatechange=()=>{ // когда меняется статус запроса, вызываем функцию
+            if (xhr.readyState === 4){ // если статус 4 (завершено)
+                if (xhr.status === 200) { // если код ответа сервера 200, получить ответ
+                    document.querySelectorAll('.formBooking')[this.number].style.display = 'none';
+                    document.querySelectorAll('.formProof')[this.number].style.display = 'block';
+                }
+                else alert('Ошибка: ' + xhr.status);
             }
-            else alert('Ошибка: ' + xhr.status);
-        }
-    };
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded'); // устанавливаем HTTP-заголовок
-    xhr.send(params); // отправляем запрос
+        };
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded'); // устанавливаем HTTP-заголовок
+        xhr.send(params); // отправляем запрос
+    }
 }
 
 function printSurnameInFormProof(e) {
