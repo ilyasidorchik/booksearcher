@@ -454,6 +454,25 @@ nav {
     }
 }
 
+.bookContainer.template .details.lead span{
+    line-height:24px;background:#eee;width:10%;color:#eee;display:inline-block;
+    animation:pulse 1s alternate infinite;
+}
+.bookContainer.template .bookDesc > h2{
+    font-size:20px; background:#eee;width:50%;animation:pulse 1s alternate infinite;
+}
+.bookContainer.template .libraryDesc .name,.bookContainer.template .libraryDesc .address {
+    line-height:24px;background:#dcdcdc;width:100%;display: inline;animation:pulseDark 1s alternate infinite;
+}
+@keyframes pulse {
+    0%{background:rgba(238,238,238,.4);}
+    100%{background:rgba(238,238,238,1);}
+}
+@keyframes pulseDark {
+    0%{background:rgba(220,220,220,.4);}
+    100%{background:rgba(220,220,220,1);}
+}
+
 .hint {
     position: relative;
     width: 24px;

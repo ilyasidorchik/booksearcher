@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', start); // когда HTML будет подготовлен и загружен, вызвать функцию start
 
 function start() {
+    document.getElementById('searchBtn').addEventListener('click', searchBook);
+    document.addEventListener('keypress',()=>{if(event.key==='Enter'){event.preventDefault();searchBook()}}); // поиск по Энтеру
+
     let requestButton = document.getElementById('toRequest');
     if (requestButton != null)
         requestButton.addEventListener('click', toRequest);
@@ -13,6 +16,33 @@ function start() {
             surname.addEventListener('blur', {handleEvent: printSurnameInFormProof, number: i, surname: surname});
         }
     }
+}
+
+function searchBook() {
+    let xhr = new XMLHttpRequest();
+    let bookTitle = document.getElementById('searchInput').value,
+        params = 'bookTitle='+bookTitle,
+        template = '<div class="row"><div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2"><div class="book"><div class="bookDesc"><h2>&nbsp;</h2><div class="details lead"> <span class="author">&nbsp;</span> <span class="publisher">&nbsp;</span> <span class="pages">&nbsp;</span></div></div></div></div></div><div class="row"><div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2"><div class="library"><div class="libraryDesc" style="width:20%"><div style="padding:0 40%" class="name">&nbsp;</div><div class="details"><div style="padding:0 50%" class="address">&nbsp;</div></div></div></div></div></div>';
+    xhr.abort(); // отменяем предыдущий запрос
+    document.getElementById('results').innerHTML=''; // очищаем контейнер для результатов
+    for (let i=0;i<3;i++){ // цикл вставки шаблона в контейнер для результатов на время загрузки
+        let elem = document.createElement('div');
+        elem.classList.add('bookContainer','template');
+        elem.innerHTML=template;
+        document.getElementById('results').append(elem);
+    }
+    history.pushState(null,null,'?title='+bookTitle); // добавление запроса в URL
+    xhr.open('POST','php/booksearch.php');
+    xhr.onreadystatechange=()=>{
+        if(xhr.readyState === 4) {
+            if(xhr.status === 200){
+                document.getElementById('results').innerHTML=xhr.responseText;
+            }
+            else console.log('Ошибка: '+xhr.status);
+        }
+    };
+    xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+    xhr.send(params);
 }
 
 function toRequest() {
