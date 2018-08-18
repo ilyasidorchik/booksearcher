@@ -11,7 +11,7 @@
                             <div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
                                  <label for="searchInput"><h4>Поиск книг в библиотеках Москвы <small class="text-muted">Бета</small></h4></label>
                                  <form action="" method="GET" class="form-inline search">
-                                     <input type="search" name="title" id="searchInput" class="form-control" placeholder="Название книги, автор или ISBN — что знаете" value='$bookTitle' $autofocus>
+                                     <input type="search" name="title" id="searchInput" class="form-control" placeholder="Название книги, автор или ISBN — что знаете" value='$bookTitle' $autofocus required>
                                      <button class="btn btn-primary ml-2">Найти</button>
                                  </form>
                             </div>
