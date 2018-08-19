@@ -56,13 +56,14 @@ function searchBook(bookTitle) {
             document.getElementById('results').append(elem);
         }
         history.pushState(null, null, '/found/' + bookTitle); // добавление запроса в URL
+        document.title = '«' + bookTitle + '» в библиотеках Москвы';
         xhr.open('POST', '../php/search.php');
         xhr.onreadystatechange=()=>{
             if(xhr.readyState === 4) {
-                if(xhr.status === 200){
-                    document.getElementById('results').innerHTML=xhr.responseText;
+                if(xhr.status === 200) {
+                    document.getElementById('results').innerHTML = xhr.responseText;
                 }
-                else console.log('Ошибка: '+xhr.status);
+                else console.log('Ошибка: ' + xhr.status);
             }
         };
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
