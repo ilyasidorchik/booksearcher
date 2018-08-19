@@ -424,7 +424,9 @@ HERE;
                 if ($availabilityOnHands)
                     $libraryBooking .= "<div class='availabilityOnHands'>$availabilityOnHandsInfo</div>";
 
-                $libraryBooking = "<div class='libraryBooking'><div class='libraryBookingText'>$libraryBooking</div>$bookingButton</div>";
+
+                if ($libraryBooking != '')
+                    $libraryBooking = "<div class='libraryBooking'><div class='libraryBookingText'>$libraryBooking</div>$bookingButton</div>";
 
                 return $library = [
                     "name" => "Деловая библиотека",
@@ -1036,7 +1038,8 @@ HERE;
         if ($bookInfoYear)
             $bookInfoYear = "<div class='libraryBookOtherYear'>$bookInfoYear</div>";
 
-        $libraryBooking = "<div class='libraryBooking'>
+        if ($libraryBookingText != '')
+            $libraryBooking = "<div class='libraryBooking'>
                                $libraryBookingButton
                                <div class='libraryBookingText'>$libraryBookingText</div>
                                $bookInfoYear

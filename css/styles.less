@@ -1,3 +1,5 @@
+@screen-sm: 767px;
+
 body {
     margin: 0;
     padding-bottom: 45px;
@@ -278,6 +280,10 @@ nav {
             background: #f0f0f0;
             border-bottom: 1px solid rgba(0,0,0,.08);
 
+            @media (max-width: @screen-sm) {
+                flex-wrap: wrap;
+            }
+
             &Desc {
                 .name {
                     font-weight: bold;
@@ -307,10 +313,19 @@ nav {
                 align-items: flex-end;
                 max-width: 300px;
 
+                @media (max-width: @screen-sm) {
+                    align-items: initial;
+                    flex-wrap: wrap;
+                }
+
+                &:not(:empty) {
+                    @media (max-width: @screen-sm) {
+                        margin-top: 10px;
+                    }
+                }
+
                 &Button {
                     display: flex;
-
-                    padding-left: 8px;
 
                     > button:first-of-type {
                         margin-right: 4px;
@@ -334,6 +349,10 @@ nav {
                         &::after {
                             content: ',';
                         }
+                    }
+
+                    @media (max-width: @screen-sm) {
+                        text-align: left;
                     }
                 }
 
@@ -374,21 +393,27 @@ nav {
                 cursor: help;
                 display: flex;
                 position: absolute;
-                top: 5;
+                top: 17px;
                 right: -24px;
                 transform: rotate(90deg);
+                line-height: 0;
+
+                @media (max-width: @screen-sm) {
+                    right: -9px;
+                }
 
                 &::after {
                     display: none;
                     content: 'Год издания';
                     position: absolute;
-                    top: 61px;
-                    right: -33px;
+                    top: 52px;
+                    right: -27px;
                     background: #ccc;
                     transform: rotate(-90deg);
                     white-space: nowrap;
                     padding: 1px 10px 3px;
                     border-radius: 3px;
+                    line-height: initial;
                 }
 
                 &:hover {
@@ -411,25 +436,10 @@ nav {
                 }
             }
         }
-
-        @media (max-width: 767px) {
-            .library {
-                flex-wrap: wrap;
-
-                .libraryBooking {
-                    flex-wrap: wrap;
-                    margin-top: 4px;
-
-                    &Text {
-                        text-align: left;
-                    }
-                }
-            }
-        }
     }
 }
 
-@media (max-width: 767px) {
+@media (max-width: @screen-sm) {
     .bookContainer .row > div {
         padding: 0;
 
@@ -454,6 +464,7 @@ nav {
     }
 }
 
+/* Прелоадер */
 .bookContainer.template .details.lead span{
     line-height:24px;background:#eee;width:10%;color:#eee;display:inline-block;
     animation:pulse 1s alternate infinite;
@@ -522,5 +533,9 @@ footer {
         bottom: 45px;
         left: 0;
         right: 0;
+
+        @media (max-width: @screen-sm) {
+            bottom: 15px;
+        }
     }
 }

@@ -4,7 +4,7 @@
     use GuzzleHttp\Client;
 
     if (isset($_POST['bookTitle'])) {
-        sleep(10);
+        //sleep(10);
 
         $bookTitle = $_POST['bookTitle'];
 

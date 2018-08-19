@@ -1,3 +1,5 @@
+var footer = document.getElementsByTagName('footer')[0];
+footer.classList.add('index');
 document.addEventListener('DOMContentLoaded', start); // когда HTML будет подготовлен и загружен, вызвать функцию start
 
 function start() {
@@ -13,6 +15,7 @@ function start() {
                 searchInput.value = bookTitle;
                 searchInput.removeAttribute('autofocus');
 
+                footer.classList.remove('index');
                 searchBook(bookTitle);
             }
             else {
@@ -39,6 +42,7 @@ function start() {
 }
 
 function searchBook(bookTitle) {
+    footer.classList.remove('index');
     let searchInput = document.getElementById('searchInput');
     if ((bookTitle == '[object MouseEvent]') || (bookTitle == undefined)) {
         bookTitle = searchInput.value;

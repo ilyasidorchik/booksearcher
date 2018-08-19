@@ -35,6 +35,21 @@
                 <div id="results"></div>
             </div>
         </main>
+        <footer>
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
+                        <p>
+                            <a href="http://sidorchik.ru/blog/all/booksearcher-beta1/" class="static">О проекте</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="https://docs.google.com/document/d/1zHMqFfosGLYYG-jE6NskzIqpjWD23PU9avdPaAH0g3Q/edit?usp=sharing" class="static"><nobr>Библиотеки-участники</nobr></a>&nbsp;&nbsp;·&nbsp;&nbsp;<wbr>Поиск&nbsp;<a href="http://rgub.ru/searchopac/" class="static">по РГБМ</a> и&nbsp;<a href="https://libfl.ru/ru/item/catalogue" class="static">Рудомино</a>
+                        </p>
+                        <p>
+                            <!--Проект придумал и разработал <a href="http://sidorchik.ru/" class="static">Илья&nbsp;Сидорчик</a>. Второй разработчик: <a href="https://vk.com/romka023" class="static">Роман&nbsp;Мешков</a>.<br>-->
+                            Если есть вопрос, замечание — пожалуйста, пишите: <a href="mailto:ilya@sidorchik.ru" class="static">ilya@sidorchik.ru</a> или&nbsp;<a href="https://t.me/ilyasidorchik" class="static">@ilyasidorchik</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </footer>
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
