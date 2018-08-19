@@ -1,22 +1,4 @@
 <?php
-    function printInput() {
-        echo <<<HERE
-            <main class="mt-4">
-                <div class="container">
-                    <div class="searchСontainer">
-                        <div class="row">
-                            <div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
-                                 <label for="searchInput"><h4>Поиск книг в библиотеках Москвы <small class="text-muted">Бета</small></h4></label>
-                                 <form class="form-inline search">
-                                     <input type="search" name="title" id="searchInput" class="form-control" placeholder="Название книги, автор или ISBN — что знаете" value='$bookTitle' autofocus required>
-                                     <button type="button" class="btn btn-primary ml-2" id="searchBtn">Найти</button>
-                                 </form>
-                            </div>
-                        </div>
-                    </div>
-HERE;
-    }
-
     function printMessageAboutNoFoundAndRequestForm($bookTitle) {
         echo <<<HERE
                         <div class="container">
@@ -828,7 +810,7 @@ HERE;
                 // Если в учётной записи есть почта — бронирование книги в один клик
                 $encryption = $_COOKIE["encryption"];
                 // Подключение к базе данных
-                include 'php/db_connection.php';
+                include 'db_connection.php';
                 $link = mysqli_connect($host, $user, $password, $database) or die("Ошибка");
                 mysqli_set_charset($link, 'utf8');
                 $result = mysqli_query($link, "SELECT * FROM readers WHERE encryption = '$encryption'");
