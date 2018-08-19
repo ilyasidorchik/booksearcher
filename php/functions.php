@@ -1315,10 +1315,10 @@ HERE;
 
     function sendEmailForBooking($email, $surname, $title, $author, $publisher, $year, $callNumber) {
         $titleQuoted = '«' . $title . '»';
-
-        // $to = 'mgdb@culture.mos.ru'; // для продакшена
-        // $to = 'abonement@nekrasovka.ru'; // для продакшена
-        $to = 'ilya@sidorchik.ru';
+        if ($_SERVER['SERVER_NAME'] == 'dev.booksearcher.ru')
+            $to = 'ilya@sidorchik.ru';
+        else
+            $to = 'abonement@nekrasovka.ru';
         $title = "Бронирование книги $titleQuoted";
         $headers  = 'MIME-Version: 1.0' . "\r\n";
         $headers .= "Content-type: text/html; charset=utf-8 \r\n";
@@ -1345,9 +1345,10 @@ HERE;
 
     function sendEmailForRequesting($title, $author, $surname, $email) {
         $titleQuoted = '«' . $title . '»';
-        
-        // $to = 'off@nekrasovka.ru'; // для продакшена
-        $to = 'ilya@sidorchik.ru';
+        if ($_SERVER['SERVER_NAME'] == 'dev.booksearcher.ru')
+            $to = 'ilya@sidorchik.ru';
+        else
+            $to = 'off@nekrasovka.ru';
         $title = "Просьба заказать книгу $titleQuoted";
         $headers  = 'MIME-Version: 1.0' . "\r\n";
         $headers .= "Content-type: text/html; charset=utf-8 \r\n";
