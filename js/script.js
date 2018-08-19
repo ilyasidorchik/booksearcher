@@ -7,11 +7,17 @@ function start() {
     if (searchInput.value == '') {
         let url = window.location.pathname;
         if (url.indexOf('/found/') != -1) {
-            bookTitle = decodeURI(url.replace('/found/', ''));
-            searchInput.value = bookTitle;
-            searchInput.removeAttribute('autofocus');
+            url = url.replace('/found/', '');
+            if (url != '') {
+                bookTitle = decodeURI(url);
+                searchInput.value = bookTitle;
+                searchInput.removeAttribute('autofocus');
 
-            searchBook(bookTitle);
+                searchBook(bookTitle);
+            }
+            else {
+                window.location.replace('/');
+            }
         }
     }
 
@@ -33,8 +39,8 @@ function start() {
 }
 
 function searchBook(bookTitle) {
+    let searchInput = document.getElementById('searchInput');
     if ((bookTitle == '[object MouseEvent]') || (bookTitle == undefined)) {
-        var searchInput = document.getElementById('searchInput');
         bookTitle = searchInput.value;
     }
     if (bookTitle != '') {

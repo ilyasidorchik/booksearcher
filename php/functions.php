@@ -868,7 +868,7 @@ HERE;
                                                                         </div>
                                                                         <div class='deliveryMan'>
                                                                             <div class='deliveryManPhoto'>
-                                                                                <img src='img/ilya-sidorchik.png'>
+                                                                                <img src='/img/ilya-sidorchik.png'>
                                                                             </div>
                                                                             <div class='deliveryManText'>
                                                                                 <p>
@@ -959,7 +959,7 @@ HERE;
                                                                         </div>
                                                                         <div class='deliveryMan'>
                                                                             <div class='deliveryManPhoto'>
-                                                                                <img src='img/ilya-sidorchik.png'>
+                                                                                <img src='/img/ilya-sidorchik.png'>
                                                                             </div>
                                                                             <div class='deliveryManText'>
                                                                                 <p>
