@@ -1,8 +1,22 @@
 document.addEventListener('DOMContentLoaded', start); // когда HTML будет подготовлен и загружен, вызвать функцию start
 
 function start() {
+    let bookTitle;
+    let searchInput = document.getElementById('searchInput');
+
+    if (searchInput.value == '') {
+        let url = window.location.pathname;
+        if (url.indexOf('/found/') != -1) {
+            bookTitle = decodeURI(url.replace('/found/', ''));
+            searchInput.value = bookTitle;
+            searchInput.removeAttribute('autofocus');
+
+            searchBook(bookTitle);
+        }
+    }
+
     document.getElementById('searchBtn').addEventListener('click', searchBook);
-    document.addEventListener('keypress',()=>{if(event.key==='Enter'){event.preventDefault();searchBook()}}); // поиск по Энтеру
+    searchInput.addEventListener('keypress',()=>{if(event.key==='Enter'){event.preventDefault();searchBook()}}); // поиск по Энтеру
 
     let requestButton = document.getElementById('toRequest');
     if (requestButton != null)
@@ -18,10 +32,12 @@ function start() {
     }
 }
 
-function searchBook() {
+function searchBook(bookTitle) {
+    if ((bookTitle == '[object MouseEvent]') || (bookTitle == undefined)) {
+        bookTitle = document.getElementById('searchInput').value;
+    }
     let xhr = new XMLHttpRequest();
-    let bookTitle = document.getElementById('searchInput').value,
-        params = 'bookTitle='+bookTitle,
+    let params = 'bookTitle='+bookTitle,
         template = '<div class="row"><div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2"><div class="book"><div class="bookDesc"><h2>&nbsp;</h2><div class="details lead"> <span class="author">&nbsp;</span> <span class="publisher">&nbsp;</span> <span class="pages">&nbsp;</span></div></div></div></div></div><div class="row"><div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2"><div class="library"><div class="libraryDesc" style="width:20%"><div style="padding:0 40%" class="name">&nbsp;</div><div class="details"><div style="padding:0 50%" class="address">&nbsp;</div></div></div></div></div></div>';
     xhr.abort(); // отменяем предыдущий запрос
     document.getElementById('results').innerHTML=''; // очищаем контейнер для результатов
@@ -31,8 +47,8 @@ function searchBook() {
         elem.innerHTML=template;
         document.getElementById('results').append(elem);
     }
-    history.pushState(null,null,'?title='+bookTitle); // добавление запроса в URL
-    xhr.open('POST','php/booksearch.php');
+    history.pushState(null, null, '/found/' + bookTitle); // добавление запроса в URL
+    xhr.open('POST','../php/booksearch.php');
     xhr.onreadystatechange=()=>{
         if(xhr.readyState === 4) {
             if(xhr.status === 200){

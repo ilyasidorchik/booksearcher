@@ -1,0 +1,9 @@
+AuthType Basic
+AuthName "Доступ запрещён!"
+AuthUserFile /var/www/vhosts/u0057069.plsk.regruhosting.ru/dev.booksearcher.ru/.htpasswd
+Require valid-user
+
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^.*$ /index.php [L,QSA]
