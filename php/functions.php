@@ -345,7 +345,7 @@ HERE;
                                         
                                             <div class='modal fade' id='bookingForm' tabindex='-1' role='dialog' aria-labelledby='bookingFormTitle' aria-hidden='true'>
                                                 <div class='modal-dialog modal-dialog-centered' role='document'>
-                                                    <div class='modal-content formBooking'>
+                                                    <div class='modal-contentformBooking'>
                                                           <div class='modal-header'>
                                                                 <h5 class='modal-title' id='exampleModalCenterTitle'>Бронирование книги</h5>
                                                                 <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
@@ -825,7 +825,7 @@ HERE;
                     $libraryBookingButton = "<button class='btn btn-outline-dark' data-toggle='modal' data-target='#deliveryForm$bookInfo_SKBM[ISBN]'>Доставить…</button>
                                              <div class='modal fade' id='deliveryForm$bookInfo_SKBM[ISBN]' tabindex='-1' role='dialog' aria-labelledby='bookingFormTitle' aria-hidden='true'>
                                                 <div class='modal-dialog modal-dialog-centered' role='document'>
-                                                    <div class='modal-content formBooking'>
+                                                    <div class='modal-content'>
                                                           <div class='modal-header'>
                                                                 <h5 class='modal-title' id='exampleModalCenterTitle'>Доставка книг из библиотеки Некрасова</h5>
                                                                 <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
@@ -916,7 +916,7 @@ HERE;
                     $libraryBookingButton = "<button class='btn btn-outline-dark' data-toggle='modal' data-target='#deliveryForm$bookInfo_SKBM[ISBN]'>Доставить…</button>
                                              <div class='modal fade' id='deliveryForm$bookInfo_SKBM[ISBN]' tabindex='-1' role='dialog' aria-labelledby='bookingFormTitle' aria-hidden='true'>
                                                 <div class='modal-dialog modal-dialog-centered' role='document'>
-                                                    <div class='modal-content formBooking'>
+                                                    <div class='modal-content'>
                                                           <div class='modal-header'>
                                                                 <h5 class='modal-title' id='exampleModalCenterTitle'>Доставка книг из библиотеки Некрасова</h5>
                                                                 <button type='button' class='close' data-dismiss='modal' aria-label='Close'>

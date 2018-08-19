@@ -1,5 +1,4 @@
 var footer = document.getElementsByTagName('footer')[0];
-footer.classList.add('index');
 document.addEventListener('DOMContentLoaded', start); // когда HTML будет подготовлен и загружен, вызвать функцию start
 
 function start() {
@@ -26,19 +25,6 @@ function start() {
 
     document.getElementById('searchBtn').addEventListener('click', searchBook);
     searchInput.addEventListener('keypress',()=>{if(event.key==='Enter'){event.preventDefault();searchBook()}}); // поиск по Энтеру
-
-    let requestButton = document.getElementById('toRequest');
-    if (requestButton != null)
-        requestButton.addEventListener('click', toRequest);
-
-    let bookingButtons = document.querySelectorAll('input[value="Забронировать"]');
-    if (bookingButtons.length > 0) {
-        for (var i = 0; i < bookingButtons.length; i++) {
-            bookingButtons[i].addEventListener('click', {handleEvent: toBook, number: i});
-            let surname = document.getElementsByName('surname')[i];
-            surname.addEventListener('blur', {handleEvent: printSurnameInFormProof, number: i, surname: surname});
-        }
-    }
 }
 
 function searchBook(bookTitle) {
@@ -66,6 +52,38 @@ function searchBook(bookTitle) {
             if(xhr.readyState === 4) {
                 if(xhr.status === 200) {
                     document.getElementById('results').innerHTML = xhr.responseText;
+
+                    // Обработка кнопок для запроса и бронирования книги
+                    let requestButton = document.getElementById('toRequest');
+                    if (requestButton != null)
+                        requestButton.addEventListener('click', toRequest);
+
+                    let bookingButtons = document.querySelectorAll('input[value="Забронировать"]');
+                    if (bookingButtons.length > 0) {
+                        for (var i = 0; i < bookingButtons.length; i++) {
+                            bookingButtons[i].addEventListener('click', {handleEvent: toBook, number: i});
+                            let surname = document.getElementsByName('surname')[i];
+                            surname.addEventListener('blur', {handleEvent: printSurnameInFormProof, number: i, surname: surname});
+                        }
+                    }
+
+                    // Добавление автора и почты в подтверждение запроса книги
+                    var inputAuthor = document.getElementById('author');
+                    if (inputAuthor != null) {
+                        inputAuthor.onblur = printAuthor;
+                        function printAuthor() {
+                            var textAuthor = document.getElementById('authorAdd');
+                            textAuthor.innerHTML = this.value;
+                        }
+                    }
+                    var inputEmail = document.getElementById('email');
+                    if (inputEmail != null) {
+                        inputEmail.onblur = printEmail;
+                        function printEmail() {
+                            var textEmail = document.getElementById('emailAdd');
+                            textEmail.innerHTML = this.value;
+                        }
+                    }
                 }
                 else console.log('Ошибка: ' + xhr.status);
             }
@@ -86,7 +104,7 @@ function toRequest() {
     let params = 'email=' + email + '&surname=' + surname + '&title=' + title + '&author=' + author;
 
     let xhr = new XMLHttpRequest();
-    xhr.open('POST', 'php/request.php'); // определяем тип запроса и ссылку на обработчик запроса
+    xhr.open('POST', '../php/request.php'); // определяем тип запроса и ссылку на обработчик запроса
     xhr.timeout = 5000; // таймаут запроса в мс
     xhr.ontimeout=()=>{alert('Превышено время ожидания ответа от сервера!')};
     xhr.onreadystatechange=()=>{ // когда меняется статус запроса, вызываем функцию
@@ -129,7 +147,7 @@ function toBook(e) {
         let params = 'email=' + email + '&surname=' + surname + '&title=' + title + '&author=' + author + '&publisher=' + publisher + '&year=' + year + '&pages=' + pages + '&callNumber=' + callNumber;
 
         let xhr = new XMLHttpRequest();
-        xhr.open('POST', 'php/book.php'); // определяем тип запроса и ссылку на обработчик запроса
+        xhr.open('POST', '../php/book.php'); // определяем тип запроса и ссылку на обработчик запроса
         xhr.timeout = 5000; // таймаут запроса в мс
         xhr.ontimeout=()=>{alert('Превышено время ожидания ответа от сервера!')};
         xhr.onreadystatechange=()=>{ // когда меняется статус запроса, вызываем функцию
@@ -149,19 +167,4 @@ function toBook(e) {
 function printSurnameInFormProof(e) {
     let textSurname = document.querySelectorAll('.surnameAdd')[this.number];
     textSurname.innerHTML = this.surname.value;
-}
-
-
-var inputAuthor = document.getElementById('author');
-inputAuthor.onblur = printAuthor;
-function printAuthor() {
-    var textAuthor = document.getElementById('authorAdd');
-    textAuthor.innerHTML = this.value;
-}
-
-var inputEmail = document.getElementById('email');
-inputEmail.onblur = printEmail;
-function printEmail() {
-    var textEmail = document.getElementById('emailAdd');
-    textEmail.innerHTML = this.value;
 }
