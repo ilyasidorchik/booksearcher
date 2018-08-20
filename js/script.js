@@ -1,9 +1,9 @@
-var footer = document.getElementsByTagName('footer')[0];
+let footer = document.getElementsByTagName('footer')[0];
+let searchInput = document.getElementById('searchInput');
 document.addEventListener('DOMContentLoaded', start); // когда HTML будет подготовлен и загружен, вызвать функцию start
 
 function start() {
     let bookTitle;
-    let searchInput = document.getElementById('searchInput');
 
     if (searchInput.value == '') {
         let url = window.location.pathname;
@@ -12,10 +12,10 @@ function start() {
             if (url != '') {
                 bookTitle = decodeURI(url);
                 searchInput.value = bookTitle;
-                searchInput.removeAttribute('autofocus');
 
-                footer.classList.remove('index');
                 searchBook(bookTitle);
+
+                console.log('Я тут');
             }
             else {
                 window.location.replace('/');
@@ -28,12 +28,12 @@ function start() {
 }
 
 function searchBook(bookTitle) {
-    footer.classList.remove('index');
-    let searchInput = document.getElementById('searchInput');
     if ((bookTitle == '[object MouseEvent]') || (bookTitle == undefined)) {
         bookTitle = searchInput.value;
     }
     if (bookTitle != '') {
+        footer.classList.remove('index');
+        searchInput.removeAttribute('autofocus');
         let xhr = new XMLHttpRequest();
         let params = 'bookTitle='+bookTitle,
             template = '<div class="row"><div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2"><div class="book"><div class="bookDesc"><h2>&nbsp;</h2><div class="details lead"> <span class="author">&nbsp;</span> <span class="publisher">&nbsp;</span> <span class="pages">&nbsp;</span></div></div></div></div></div><div class="row"><div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2"><div class="library"><div class="libraryDesc" style="width:20%"><div style="padding:0 40%" class="name">&nbsp;</div><div class="details"><div style="padding:0 50%" class="address">&nbsp;</div></div></div></div></div></div>';

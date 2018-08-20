@@ -1,4 +1,7 @@
 <?php
+    if ($_SERVER['SERVER_NAME'] == 'dev.booksearcher.ru')
+        $devMode = true;
+
     function printMessageAboutNoFoundAndRequestForm($bookTitle) {
         echo <<<HERE
                         <div class="container">
@@ -1315,7 +1318,8 @@ HERE;
 
     function sendEmailForBooking($email, $surname, $title, $author, $publisher, $year, $callNumber) {
         $titleQuoted = '«' . $title . '»';
-        if ($_SERVER['SERVER_NAME'] == 'dev.booksearcher.ru')
+        global $devMode;
+        if ($devMode)
             $to = 'ilya@sidorchik.ru';
         else
             $to = 'abonement@nekrasovka.ru';
@@ -1345,7 +1349,8 @@ HERE;
 
     function sendEmailForRequesting($title, $author, $surname, $email) {
         $titleQuoted = '«' . $title . '»';
-        if ($_SERVER['SERVER_NAME'] == 'dev.booksearcher.ru')
+        global $devMode;
+        if ($devMode)
             $to = 'ilya@sidorchik.ru';
         else
             $to = 'off@nekrasovka.ru';
