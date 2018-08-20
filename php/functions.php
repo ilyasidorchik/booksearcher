@@ -1198,6 +1198,8 @@ HERE;
                     array_push($dates, $date);
                 }
 
+                $dates = dsort($dates);
+
                 foreach ($dates as $date) {
                     $availabilityInfo .= $date . ', ';
                 }
@@ -1315,6 +1317,15 @@ HERE;
         $strTypografed = strip_tags($strTypografed);
         $strTypografed = substr($strTypografed, 0, -1);
         return $strTypografed;
+    }
+
+    function dsort($dates) {
+        function sortDates($a, $b) {
+            if (date(strtotime($a)) > date(strtotime($b))) return 1;
+            else return 0;
+        }
+        usort($dates, 'sortDates');
+        return $dates;
     }
 
     function sendEmailForBooking($email, $surname, $title, $author, $publisher, $year, $callNumber) {
