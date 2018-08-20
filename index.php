@@ -50,7 +50,7 @@
                             <a href="http://sidorchik.ru/blog/all/booksearcher-beta1/" class="static">О проекте</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="https://docs.google.com/document/d/1zHMqFfosGLYYG-jE6NskzIqpjWD23PU9avdPaAH0g3Q/edit?usp=sharing" class="static"><nobr>Библиотеки-участники</nobr></a>&nbsp;&nbsp;·&nbsp;&nbsp;<wbr>Поиск&nbsp;<a href="http://rgub.ru/searchopac/" class="static">по РГБМ</a> и&nbsp;<a href="https://libfl.ru/ru/item/catalogue" class="static">Рудомино</a>
                         </p>
                         <p>
-                            <!--Проект придумал и разработал <a href="http://sidorchik.ru/" class="static">Илья&nbsp;Сидорчик</a>. Второй разработчик: <a href="https://vk.com/romka023" class="static">Роман&nbsp;Мешков</a>.<br>-->
+                            Разработчики: <a href="http://sidorchik.ru/" class="static">Илья&nbsp;Сидорчик</a>, <a href="https://vk.com/romka023" class="static">Роман&nbsp;Мешков</a>. Тайный советник: <a href="http://blinov.design" class="static">Роберт&nbsp;Блинов</a><br>
                             Если есть вопрос, замечание — пожалуйста, пишите: <a href="mailto:ilya@sidorchik.ru" class="static">ilya@sidorchik.ru</a> или&nbsp;<a href="https://t.me/ilyasidorchik" class="static">@ilyasidorchik</a>
                         </p>
                     </div>
