@@ -197,6 +197,7 @@ HERE;
                 // Год издания
                 preg_match('/<Дата издания:> (.*?)"/', $source, $matches);
                 $year = preg_replace("/[^0-9]/", '', $matches[1]);
+                $year = substr($year, 0, 4);
 
                 // Объём
                 preg_match('/<Объем:> (.*?)"/', $source, $matches);
