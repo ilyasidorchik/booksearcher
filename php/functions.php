@@ -1319,12 +1319,8 @@ HERE;
         return $strTypografed;
     }
 
-    function dsort($dates) {
-        function sortDates($a, $b) {
-            if (date(strtotime($a)) > date(strtotime($b))) return 1;
-            else return 0;
-        }
-        usort($dates, 'sortDates');
+    function dsort($dates){
+        usort($dates,function($a,$b){if(date(strtotime($a))>date(strtotime($b))) return 1; else return 0;});
         return $dates;
     }
 
