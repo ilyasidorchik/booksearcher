@@ -1195,7 +1195,8 @@ HERE;
                 $booksCount = preg_match_all('/_location: "(.*?)"/', $availabilityResponse, $matches);
                 for ($i = 0; $i < $booksCount; $i++) {
                     $date = preg_replace("/[^.0-9]/", '', $matches[1][$i]);
-                    array_push($dates, $date);
+                    if ($date != '')
+                        array_push($dates, $date);
                 }
 
                 $dates = dsort($dates);
@@ -1204,9 +1205,6 @@ HERE;
                     $availabilityInfo .= $date . ', ';
                 }
                 $availabilityInfo = substr($availabilityInfo, 0, -2);
-                if (substr($availabilityInfo, -2) == ', ') {
-                    $availabilityInfo = substr($availabilityInfo, 0, -2);
-                }
             }
             else
                 $availabilityInfo = 'Книги нет';
