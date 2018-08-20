@@ -51,7 +51,7 @@
                         </p>
                         <p>
                             Разработчики: <a href="http://sidorchik.ru/" class="static">Илья&nbsp;Сидорчик</a>, <a href="https://vk.com/romka023" class="static">Роман&nbsp;Мешков</a>. Тайный советник: <a href="http://blinov.design" class="static">Роберт&nbsp;Блинов</a><br>
-                            Если есть вопрос, замечание — пожалуйста, пишите: <a href="mailto:ilya@sidorchik.ru" class="static">ilya@sidorchik.ru</a> или&nbsp;<a href="https://t.me/ilyasidorchik" class="static">@ilyasidorchik</a>
+                            Если есть вопрос, замечание — пишите, пожалуйста: <a href="mailto:ilya@sidorchik.ru" class="static">ilya@sidorchik.ru</a> или&nbsp;<a href="https://t.me/ilyasidorchik" class="static">@ilyasidorchik</a>
                         </p>
                     </div>
                 </div>
