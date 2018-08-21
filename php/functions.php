@@ -2,6 +2,8 @@
     if ($_SERVER['SERVER_NAME'] == 'dev.booksearcher.ru')
         $devMode = true;
 
+    $ini = parse_ini_file('../app.ini', true);
+
     function printMessageAboutNoFoundAndRequestForm($bookTitle) {
         echo <<<HERE
                         <div class="container">
@@ -34,8 +36,8 @@ HERE;
         $encryption = $_COOKIE["encryption"];
 
         /* Подключение к базе данных */
-        include 'db_connection.php';
-        $link = mysqli_connect($host, $user, $password, $database) or die("Ошибка");
+        global $ini;
+        $link = mysqli_connect($ini[database][host], $ini[database][user], $ini[database][password], $ini[database][name]) or die('Ошибка');
 
         $result = mysqli_query($link, "SELECT email FROM readers WHERE encryption = '$encryption'");
         $row = mysqli_fetch_assoc($result);
@@ -62,7 +64,7 @@ HERE;
         }
 
         $title = typograf('«' . $bookTitle . '»');
-        
+
         echo <<<HERE
                                         </div>
                                         <div class="modal-footer">
@@ -799,15 +801,17 @@ HERE;
                 'querylist' => '<_service>STORAGE:opacafd:View[separator]<_version>1.3.0[separator]<session>27510[separator]<iddb>100[separator]<id>'.$libraryAuthID.'[separator]<length>15[separator]<$length>15[separator]<$start>1[separator]<mode>OUTRECORD[separator]<outforms[0]>BLK856[separator]<outforms[1]>TITLE[separator]<outforms[2]>ADDRESS[separator]<outforms[3]>BLK305[separator]<outforms[4]>BLK300[separator]<outforms[5]>BLOCK310[separator]<outforms[6]>BLOCK320[separator]<outforms[7]>BLOCK330[separator]<outforms[8]>BLOCK340[separator]<outforms[9]>BLOCK4[separator]<outforms[10]>BLOCK5[separator]<outforms[11]>BLOCK7[separator]<userId>ADMIN[separator]<$basequant>2392771[separator]<$flag45>yes'
             ]
         ]);
-        $libraryTimetable = $responseLibraryInfo->getBody();
-        preg_match('/text: "Интернет-сайт\[END\](.*?)"/', $libraryTimetable, $matches);
-        $libraryTimetable = $matches[1];
+        $libraryWebsite = $responseLibraryInfo->getBody();
+        preg_match('/text: "Интернет-сайт\[END\](.*?)"/', $libraryWebsite, $matches);
+        $libraryWebsite = $matches[1];
 
         if (!$libraryAddress)
             $libraryAddress = '&nbsp;';
 
 
         if ($libraryName == 'Библиотека Некрасова') {
+            $libraryTimetable = getTimetable($libraryName);
+
             $libraryBooking = getBookAvailabilityInNekrasovka($client, $bookInfo_SKBM);
             $libraryBookingText = $libraryBooking[availabilityInfoText];
             $callNumber = $libraryBooking[callNumber];
@@ -816,8 +820,8 @@ HERE;
                 // Если в учётной записи есть почта — бронирование книги в один клик
                 $encryption = $_COOKIE["encryption"];
                 // Подключение к базе данных
-                include 'db_connection.php';
-                $link = mysqli_connect($host, $user, $password, $database) or die("Ошибка");
+                global $ini;
+                $link = mysqli_connect($ini[database][host], $ini[database][user], $ini[database][password], $ini[database][name]) or die('Ошибка');
                 mysqli_set_charset($link, 'utf8');
                 $result = mysqli_query($link, "SELECT * FROM readers WHERE encryption = '$encryption'");
                 $row = mysqli_fetch_assoc($result);
@@ -1052,6 +1056,7 @@ HERE;
         $libraryInfo = [
             "name" => $libraryNameTypografed,
             "address" => $libraryAddress,
+            "website" => $libraryWebsite,
             "timetable" => $libraryTimetable,
             "availability" => $libraryBooking
         ];
@@ -1065,9 +1070,10 @@ HERE;
                 <div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
                     <div class="library">
                         <div class="libraryDesc">
-                            <div class="name"><a href='$libraryInfo[timetable]' class='static'>$libraryInfo[name]</a></div>
+                            <div class="name"><a href='$libraryInfo[website]' class='static'>$libraryInfo[name]</a></div>
                             <div class="details">
                                 <div class="address">$libraryInfo[address]</div>
+                                $libraryInfo[timetable]
                             </div>
                         </div>
                         $libraryInfo[availability]
@@ -1272,8 +1278,8 @@ HERE;
         $longitudeFrom = $jsonGeocoder["results"][0]["geometry"]["location"]["lng"];
 
         // Подключение к базе данных с таблицей метро
-        require 'db_connection.php';
-        $link = mysqli_connect($host, $user, $password, $database) or die("Не удалось подключиться к базе данных");
+        global $ini;
+        $link = mysqli_connect($ini[database][host], $ini[database][user], $ini[database][password], $ini[database][name]) or die('Ошибка');
         mysqli_set_charset($link, "utf8");
 
         // Определение ближайшего метро путём перебора
@@ -1300,6 +1306,87 @@ HERE;
             }
         }
         return 'м. ' . $closestMetro . ', ';
+    }
+
+function getTimetable($library) {
+    global $ini;
+
+    switch ($library) {
+        case 'Библиотека Некрасова':
+            $library = 'nekrasovka';
+            break;
+        case 'Деловая':
+            $library = 'mgdb';
+            break;
+    }
+
+    $schedule = array();
+    for ($dayI = 0; $dayI < 7; $dayI++) {
+        $times = explode(",", $ini[$library][schedule][$dayI]);
+        array_push($schedule, $times);
+    }
+
+    $holidaysCount = count($ini[$library][holidays]);
+    if ($holidaysCount)
+        $holidays = array();
+    for ($holidaysI = 0; $holidaysI < $holidaysCount; $holidaysI++) {
+        array_push($holidays, date('d.m', strtotime($ini[$library][holidays][$holidaysI])));
+    }
+
+    $monthsList = array(".01" => "января с ", ".02" => "февраля с ",
+        ".03" => "марта с ", ".04" => "апреля с ", ".05" => "мая с ", ".06" => "июня с ",
+        ".07" => "июля с ", ".08" => "августа с ", ".09" => "сентября с ",
+        ".10" => "октября с ", ".11" => "ноября с ", ".12" => "декабря с ");
+
+    $scheduleStatus = checkSchedule($schedule, $holidays, $monthsList);
+    $scheduleColor = defineColor($schedule, $holidays);
+
+    return <<<HERE
+            <div class="schedule $scheduleColor">
+                <span class="schedule_link">Режим работы</span>
+                <span class="schedule_hint">$scheduleStatus</span>
+            </div>
+HERE;
+}
+
+    function checkSchedule($schedule, $holidays, $monthsList) {
+        $date = getdate();
+        if (isHoliday(date('d.m'),$holidays)) {
+            for ($i = 1; $i < 14; $i++) {
+                if (!isHoliday(date('d.m', strtotime("+$i days")),$holidays)) {
+                    if ($i==1) return ($date['wday']==6)?'Завтра с '.$schedule[0][0]:'Завтра с '.$schedule[$date['wday']+1][0];
+                    else if ($i==2) return ($date['wday']>=5)?'Послезавтра с '.$schedule[$date['wday']-5][0]:'Послезавтра с '.$schedule[$date['wday']+2][0];
+                    else if ($i>=8) {
+                        $fDate=str_replace(date(".m"), " ".$monthsList[date(".m")], date("d.m",strtotime("+$i days")));
+                        return $fDate.$schedule[$i-8][0];
+                    }
+                    else {
+                        $fDate=str_replace(date(".m"), " ".$monthsList[date(".m")], date("d.m",strtotime("+$i days")));
+                        return $fDate.(($date['wday']>=$i)? $schedule[$date['wday']+($i-7)][0]:$schedule[$date['wday']+$i][0]);
+                    }
+                    break;
+                }
+            }
+        }
+        else {
+            if ($date['hours']<$schedule[$date['wday']][0]) return 'Сегодня с '.$schedule[$date['wday']][0];
+            else if ($date['hours']>=$schedule[$date['wday']][1])
+                return ($date['wday']==6)?'Завтра с '.$schedule[0][0]:'Завтра с '.$schedule[$date['wday']+1][0];
+            else return 'Сегодня до '.$schedule[$date['wday']][1];
+        }
+        return 'Ближайшую неделю закрыто';
+    }
+
+    function defineColor($schedule,$holidays) {
+        $date=getdate();
+        if(($date['hours']<$schedule[$date['wday']][0])||($date['hours']>=$schedule[$date['wday']][1])||(isHoliday(date('d.m'),$holidays))) return 'schedule-closed';
+        else return 'schedule-open';
+    }
+
+    function isHoliday($day, $holidays) { // returns null or true
+        foreach ($holidays as $holiday) {
+            if ($day==$holiday) {return true;break;}
+        }
     }
 
     function makeFirstLetterCapital($str, $encoding = 'UTF-8') {

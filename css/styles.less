@@ -304,6 +304,24 @@ nav {
                             .static;
                         }
                     }
+
+                    .schedule-closed{
+                        color: #ea3800;
+                    }
+                    .schedule-open{
+                        color:#00720f;
+                    }
+                    .schedule-closed .schedule_link{
+                        border-bottom: 1px dashed #FF726F;
+                    }
+                    .schedule-open .schedule_link{
+                        border-bottom: 1px dashed #88b386;
+                    }
+                    .schedule_hint::before{
+                        margin-left: 3px;
+                        border-bottom: none;
+                        content: ' · ';
+                    }
                 }
             }
 

@@ -1,6 +1,8 @@
 <?php
     if ($_SERVER['SERVER_NAME'] == 'dev.booksearcher.ru')
         $devMode = true;
+
+    //echo getWorkingTime($ini, 'Некрасовка');
 ?>
 <!-- Поиск книг в библиотеках Москвы. Бета 5 © Илья Сидорчик -->
 <html lang="ru">
