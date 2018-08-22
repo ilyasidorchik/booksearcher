@@ -1308,46 +1308,61 @@ HERE;
         return 'м. ' . $closestMetro . ', ';
     }
 
-function getTimetable($library) {
-    global $ini;
+    function getTimetable($library) {
+        global $ini;
 
-    switch ($library) {
-        case 'Библиотека Некрасова':
-            $library = 'nekrasovka';
-            break;
-        case 'Деловая':
-            $library = 'mgdb';
-            break;
-    }
+        switch ($library) {
+            case 'Библиотека Некрасова':
+                $library = 'nekrasovka';
+                break;
+            case 'Деловая библиотека':
+                $library = 'mgdb';
+                break;
+        }
 
-    $schedule = array();
-    for ($dayI = 0; $dayI < 7; $dayI++) {
-        $times = explode(",", $ini[$library][schedule][$dayI]);
-        array_push($schedule, $times);
-    }
+        $schedule = array();
+        for ($dayI = 0; $dayI < 7; $dayI++) {
+            $times = explode(",", $ini[$library][schedule][$dayI]);
+            array_push($schedule, $times);
+        }
 
-    $holidaysCount = count($ini[$library][holidays]);
-    if ($holidaysCount)
-        $holidays = array();
-    for ($holidaysI = 0; $holidaysI < $holidaysCount; $holidaysI++) {
-        array_push($holidays, date('d.m', strtotime($ini[$library][holidays][$holidaysI])));
-    }
+        $holidaysCount = count($ini[$library][holidays]);
+        if ($holidaysCount)
+            $holidays = array();
+        for ($holidaysI = 0; $holidaysI < $holidaysCount; $holidaysI++) {
+            array_push($holidays, date('d.m', strtotime($ini[$library][holidays][$holidaysI])));
+        }
 
-    $monthsList = array(".01" => "января с ", ".02" => "февраля с ",
-        ".03" => "марта с ", ".04" => "апреля с ", ".05" => "мая с ", ".06" => "июня с ",
-        ".07" => "июля с ", ".08" => "августа с ", ".09" => "сентября с ",
-        ".10" => "октября с ", ".11" => "ноября с ", ".12" => "декабря с ");
+        $monthsList = array(".01" => "января с ", ".02" => "февраля с ",
+            ".03" => "марта с ", ".04" => "апреля с ", ".05" => "мая с ", ".06" => "июня с ",
+            ".07" => "июля с ", ".08" => "августа с ", ".09" => "сентября с ",
+            ".10" => "октября с ", ".11" => "ноября с ", ".12" => "декабря с ");
 
-    $scheduleStatus = checkSchedule($schedule, $holidays, $monthsList);
-    $scheduleColor = defineColor($schedule, $holidays);
+        $scheduleStatus = checkSchedule($schedule, $holidays, $monthsList);
+        $scheduleColor = defineColor($schedule, $holidays);
 
-    return <<<HERE
-            <div class="schedule $scheduleColor">
-                <span class="schedule_link">Режим работы</span>
-                <span class="schedule_hint">$scheduleStatus</span>
-            </div>
+        return <<<HERE
+                <div class="timetable $scheduleColor">
+                    <span class="timetableLink timetableLinkClosed"><u>Режим работы</u></span>
+                    <span class="timetableHint">$scheduleStatus</span>
+                    <div class="timetableSchedule">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>Понедельник — суббота:</td>
+                                    <td>10—22</td>
+                                </tr>
+                                <tr>
+                                    <td>Воскресенье:</td>
+                                    <td>10—20</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p><img src="/img/cleanup-day.svg" alt="Закрыто на санитарный день">Последний вторник месяца</p>
+                    </div>
+                </div>
 HERE;
-}
+    }
 
     function checkSchedule($schedule, $holidays, $monthsList) {
         $date = getdate();
@@ -1379,8 +1394,8 @@ HERE;
 
     function defineColor($schedule,$holidays) {
         $date=getdate();
-        if(($date['hours']<$schedule[$date['wday']][0])||($date['hours']>=$schedule[$date['wday']][1])||(isHoliday(date('d.m'),$holidays))) return 'schedule-closed';
-        else return 'schedule-open';
+        if(($date['hours']<$schedule[$date['wday']][0])||($date['hours']>=$schedule[$date['wday']][1])||(isHoliday(date('d.m'),$holidays))) return 'timetable-closed';
+        else return 'timetable-open';
     }
 
     function isHoliday($day, $holidays) { // returns null or true

@@ -14,8 +14,6 @@ function start() {
                 searchInput.value = bookTitle;
 
                 searchBook(bookTitle);
-
-                console.log('Я тут');
             }
             else {
                 window.location.replace('/');
@@ -83,6 +81,12 @@ function searchBook(bookTitle) {
                             var textEmail = document.getElementById('emailAdd');
                             textEmail.innerHTML = this.value;
                         }
+                    }
+
+                    // Открывание/скрывание режима работы библиотек
+                    var timetableLink = document.querySelectorAll('.timetableLink')[0];
+                    if (timetableLink) {
+                        timetableLink.addEventListener('click', {handleEvent: controlSchedule, link: timetableLink});
                     }
                 }
                 else console.log('Ошибка: ' + xhr.status);
@@ -167,4 +171,19 @@ function toBook(e) {
 function printSurnameInFormProof(e) {
     let textSurname = document.querySelectorAll('.surnameAdd')[this.number];
     textSurname.innerHTML = this.surname.value;
+}
+
+function controlSchedule(e) {
+    var link = this.link;
+    var schedule = document.querySelectorAll('.timetableSchedule')[0];
+    if (link.classList.contains('timetableLinkClosed')) {
+        link.classList.remove('timetableLinkClosed');
+        link.classList.add('timetableLinkOpened');
+        schedule.style.display = 'block';
+    }
+    else {
+        link.classList.remove('timetableLinkOpened');
+        link.classList.add('timetableLinkClosed');
+        schedule.style.display = 'none';
+    }
 }
