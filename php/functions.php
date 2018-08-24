@@ -1395,7 +1395,6 @@ HERE;
     function defineColor($schedule,$holidays) {
         $date=getdate();
         if(($date['hours']<$schedule[$date['wday']][0])||($date['hours']>=$schedule[$date['wday']][1])||(isHoliday(date('d.m'),$holidays))) return 'timetable-closed';
-        else return 'timetable-open';
     }
 
     function isHoliday($day, $holidays) { // returns null or true
