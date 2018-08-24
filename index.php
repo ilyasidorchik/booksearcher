@@ -28,6 +28,7 @@
         <![endif]-->
     </head>
     <body>
+        <div class="searchAlert"></div>
         <main class="mt-4">
             <div class="container">
                 <div class="searchСontainer">
