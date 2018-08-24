@@ -67,6 +67,7 @@ HERE;
         $title = typograf('«' . $bookTitle . '»');
 
         echo <<<HERE
+                                            <hr><div>Сайт запомнит вашу почту и фамилию. Когда будете снова запрашивать, останется ввести автора</div>
                                         </div>
                                         <div class="modal-footer">
                                             <input type="button" class="btn btn-primary" id="toRequest" value="Запросить">
@@ -377,7 +378,8 @@ HERE;
                                                                     <input type='hidden' name='year' value='$bookInfo_MGDB[year]'>
                                                                     <input type='hidden' name='pages' value='$bookInfo_MGDB[pages]'>
                                                                     <input type='hidden' name='callNumber' value='$bookInfo_MGDB[callNumber]'>
-                                                                </div>
+                                                                    <hr><div>Сайт запомнит вашу почту и фамилию. Когда будете снова бронировать, останется нажать кнопку</div>
+                                                              </div>
                                                               <div class='modal-footer'>
                                                                     <button name='toBook' class='btn btn-primary'>Забронировать$nextWorkingDay</button>
                                                               </div>
@@ -1022,6 +1024,7 @@ HERE;
                                                                     <input type='hidden' name='year' value='$bookInfo_SKBM[year]'>
                                                                     <input type='hidden' name='pages' value='$bookInfo_SKBM[pages]'>
                                                                     <input type='hidden' name='callNumber' value='$callNumber'>
+                                                                    <hr><div>Сайт запомнит вашу почту и фамилию. Когда будете снова бронировать, останется нажать кнопку</div>
                                                                 </div>
                                                               <div class='modal-footer'>
                                                                     <input type='button' class='btn btn-primary' value='Забронировать'>
