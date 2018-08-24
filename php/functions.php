@@ -914,7 +914,7 @@ HERE;
                                                 <input type='button' class='btn btn-outline-dark' value='Забронировать'>
                                             </form>
                                             <div class='formProof' style='display: none;'>
-                                                <button class='btn btn-success' disabled>Забронировано</button>
+                                                <button class='btn btn-success' disabled>Забронирована</button>
                                             </div>";
                 }
                 else {
