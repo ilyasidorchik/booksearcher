@@ -43,6 +43,7 @@ HERE;
         $row = mysqli_fetch_assoc($result);
         if (!$row['email']) {
             echo <<<HERE
+                                            <hr>
                                             <div class="form-group">
                                                 <label for="email">Ваша эл. почта</label>
                                                 <input type="email" name="email" class="form-control" id="email" aria-describedby="emailHelp" required>
