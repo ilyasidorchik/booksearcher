@@ -2,7 +2,7 @@
     if ($_SERVER['SERVER_NAME'] == 'dev.booksearcher.ru')
         $devMode = true;
 ?>
-<!-- Поиск книг в библиотеках Москвы. Бета 5 © Илья Сидорчик -->
+<!-- Поиск книг в библиотеках Москвы. Бета 6 © Илья Сидорчик -->
 <html lang="ru">
     <head>
         <meta charset="utf-8">
