@@ -88,9 +88,16 @@ function searchBook(bookTitle) {
                     }
 
                     // Открывание/скрывание режима работы библиотек
-                    var timetableLink = document.querySelectorAll('.timetableLink')[0];
-                    if (timetableLink) {
-                        timetableLink.addEventListener('click', {handleEvent: controlSchedule, link: timetableLink});
+                    var timetableLinks = document.querySelectorAll('.timetableLink');
+                    if (timetableLinks.length > 0) {
+                        for (let i = 0; i < timetableLinks.length; i++) {
+                            let timetableLink = timetableLinks[i];
+                            timetableLink.addEventListener('click', {
+                                handleEvent: controlSchedule,
+                                link: timetableLink,
+                                number: i
+                            });
+                        }
                     }
                 }
                 else console.log('Ошибка: ' + xhr.status);
@@ -181,7 +188,7 @@ function printSurnameInFormProof(e) {
 
 function controlSchedule(e) {
     var link = this.link;
-    var schedule = document.querySelectorAll('.timetableSchedule')[0];
+    var schedule = document.querySelectorAll('.timetableSchedule')[this.number];
     if (link.classList.contains('timetableLinkClosed')) {
         link.classList.remove('timetableLinkClosed');
         link.classList.add('timetableLinkOpened');
