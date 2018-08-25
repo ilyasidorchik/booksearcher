@@ -52,7 +52,6 @@ function searchBook(bookTitle) {
             if(xhr.readyState === 4) {
                 if(xhr.status === 200) {
                     clearTimeout(alert); // ОСТАНАВЛИВАЕМ ТАЙМЕР
-                    if(document.body.contains(document.querySelector('.searchAlert'))) closeAlert(document.querySelector('.searchAlert'));
 
                     document.getElementById('results').innerHTML = xhr.responseText;
 
