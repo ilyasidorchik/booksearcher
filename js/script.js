@@ -25,6 +25,7 @@ function start() {
     searchInput.addEventListener('keypress',()=>{if(event.key==='Enter'){event.preventDefault();searchBook()}}); // поиск по Энтеру
 }
 
+// Главные функции
 function searchBook(bookTitle) {
     if ((bookTitle == '[object MouseEvent]') || (bookTitle == undefined)) {
         bookTitle = searchInput.value;
@@ -35,7 +36,7 @@ function searchBook(bookTitle) {
         let xhr = new XMLHttpRequest();
         let params = 'bookTitle='+bookTitle,
             template = '<div class="row"><div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2"><div class="book"><div class="bookDesc"><h2>&nbsp;</h2><div class="details lead"> <span class="author">&nbsp;</span> <span class="publisher">&nbsp;</span> <span class="pages">&nbsp;</span></div></div></div></div></div><div class="row"><div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2"><div class="library"><div class="libraryDesc" style="width:20%"><div style="padding:0 40%" class="name">&nbsp;</div><div class="details"><div style="padding:0 50%" class="address">&nbsp;</div></div></div></div></div></div>',
-            alert = setTimeout(showAlert, 5000, document.querySelector('.searchAlert'), 'Книга нашлась, библиотек много. Быстрее поиск работает с новыми книгами, которых немного, например <a href="http://dev.booksearcher.ru/found/Дизайн%20—%20это%20работа" class="static">Дизайн&nbsp;—&nbsp;это&nbsp;работа</a>');
+            alert = setTimeout(showSearchAlert, 5000, document.querySelector('.searchAlert'), 'Книга нашлась, библиотек много. Быстрее поиск работает с новыми книгами, которых немного, например <a href="http://dev.booksearcher.ru/found/Дизайн%20—%20это%20работа" class="static">Дизайн&nbsp;—&nbsp;это&nbsp;работа</a>');
         xhr.abort(); // отменяем предыдущий запрос
         document.getElementById('results').innerHTML=''; // очищаем контейнер для результатов
         for (let i=0;i<3;i++){ // цикл вставки шаблона в контейнер для результатов на время загрузки
@@ -51,7 +52,7 @@ function searchBook(bookTitle) {
             if(xhr.readyState === 4) {
                 if(xhr.status === 200) {
                     clearTimeout(alert); // ОСТАНАВЛИВАЕМ ТАЙМЕР
-                    closeAlert(document.querySelector('.searchAlert'));
+                    if(document.body.contains(document.querySelector('.searchAlert'))) closeAlert(document.querySelector('.searchAlert'));
 
                     document.getElementById('results').innerHTML = xhr.responseText;
 
@@ -172,6 +173,8 @@ function toBook(e) {
     }
 }
 
+
+// Сопутствующие функции
 function printSurnameInFormProof(e) {
     let textSurname = document.querySelectorAll('.surnameAdd')[this.number];
     textSurname.innerHTML = this.surname.value;
@@ -192,15 +195,15 @@ function controlSchedule(e) {
     }
 }
 
-function showAlert(alertID, content) { // ПОКАЗ УВЕДОМЛЕНИЯ
+function showSearchAlert(alertID, content) { // ПОКАЗ УВЕДОМЛЕНИЯ
     alertID.style.display='flex';
-    alertID.style.animationName='showAlert';
+    alertID.style.animationName='showSearchAlert';
     alertID.innerHTML='<div>'+content+'</div>'+'<svg viewBox="0 0 10 10" class="closeBtn"><path d="M2,8 L8,2" class="closeBtn_p1"></path><path d="M2,2 L8,8" class="closeBtn_p2"></path></svg>';
-    let aTimer=setTimeout(closeAlert,100000,alertID);
-    document.querySelector('.closeBtn').addEventListener('click',()=>{closeAlert(alertID);clearTimeout(aTimer);});
+    let aTimer=setTimeout(closeSearchAlert, 15000, alertID);
+    document.querySelector('.closeBtn').addEventListener('click',()=>{closeSearchAlert(alertID);clearTimeout(aTimer);});
 }
 
-function closeAlert(alertID) { // СКРЫТИЕ УВЕДОМЛЕНИЯ
-    alertID.style.animationName='closeAlert';
+function closeSearchAlert(alertID) { // СКРЫТИЕ УВЕДОМЛЕНИЯ
+    alertID.style.animationName='closeSearchAlert';
     setTimeout(()=>{alertID.style.display=''},1000)
 }
