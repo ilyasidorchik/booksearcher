@@ -440,7 +440,8 @@ HERE;
                 return $library = [
                     "name" => "Деловая библиотека",
                     "address" => "м. ВДНХ, ул. Бориса Галушкина, 19к1",
-                    "timetable" => "http://mgdb.mos.ru/",
+                    "website" => "http://mgdb.mos.ru/",
+                    "timetable" => 'Время работы',
                     "availability" => $libraryBooking
                 ];
         }
