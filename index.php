@@ -2,7 +2,7 @@
     if ($_SERVER['SERVER_NAME'] == 'dev.booksearcher.ru')
         $devMode = true;
 ?>
-<!-- Поиск книг в библиотеках Москвы. Бета 6 © Илья Сидорчик -->
+<!-- Поиск книг в библиотеках Москвы © Илья Сидорчик -->
 <html lang="ru">
     <head>
         <meta charset="utf-8">
@@ -32,7 +32,7 @@
                 <div class="searchСontainer">
                     <div class="row">
                         <div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
-                            <label for="searchInput"><h4>Поиск книг в библиотеках Москвы <small class="text-muted">Бета</small></h4></label>
+                            <label for="searchInput"><h4>Поиск книг в библиотеках Москвы</h4></label>
                             <form class="form-inline search">
                                 <input type="search" name="title" id="searchInput" class="form-control" placeholder="Название книги, автор или ISBN — что знаете" autofocus required>
                                 <button type="button" class="btn btn-primary ml-2" id="searchBtn">Найти</button>
@@ -48,11 +48,10 @@
                 <div class="row">
                     <div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
                         <p>
-                            <a href="http://sidorchik.ru/blog/all/booksearcher-beta1/" class="static">О проекте</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="https://docs.google.com/document/d/1zHMqFfosGLYYG-jE6NskzIqpjWD23PU9avdPaAH0g3Q/edit?usp=sharing" class="static"><nobr>Библиотеки-участники</nobr></a>&nbsp;&nbsp;·&nbsp;&nbsp;<wbr>Поиск&nbsp;<a href="http://rgub.ru/searchopac/" class="static">по РГБМ</a> и&nbsp;<a href="https://libfl.ru/ru/item/catalogue" class="static">Рудомино</a>
+                            <a href="http://sidorchik.ru/blog/all/booksearcher-beta1/" class="static">О проекте</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="https://docs.google.com/document/d/1zHMqFfosGLYYG-jE6NskzIqpjWD23PU9avdPaAH0g3Q/edit?usp=sharing" class="static"><nobr>Библиотеки-участники</nobr></a>&nbsp;&nbsp;·&nbsp;&nbsp;<wbr>Поиск&nbsp;<a href="http://rgub.ru/searchopac/" class="static">по РГБМ</a> и&nbsp;<a href="https://libfl.ru/ru/item/catalogue" class="static">Рудомино</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="mailto:ilya@sidorchik.ru" class="static">ilya@sidorchik.ru</a>
                         </p>
                         <p>
                             Разработчики <a href="http://sidorchik.ru/" class="static">Илья&nbsp;Сидорчик</a>, <a href="https://vk.com/romka023" class="static">Роман&nbsp;Мешков</a>, тайный советник <a href="http://blinov.design" class="static">Роберт&nbsp;Блинов</a><br>
-                            Если есть вопрос, замечание — пишите, пожалуйста: <a href="mailto:ilya@sidorchik.ru" class="static">ilya@sidorchik.ru</a> или&nbsp;<a href="https://t.me/ilyasidorchik" class="static">@ilyasidorchik</a>
                         </p>
                     </div>
                 </div>
