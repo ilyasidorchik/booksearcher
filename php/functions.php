@@ -73,7 +73,7 @@ HERE;
                                             <input type="button" class="btn btn-primary" id="toRequest" value="Запросить">
                                         </div>
                                     </form>
-                                    <div class="formProof alert alert-success" role="alert" style="display: none;">
+                                    <div class="formProof alert alert-success" role="alert">
                                         <h4 class="alert-heading">
                                             Книга запрошена
                                         </h4>
@@ -267,21 +267,15 @@ HERE;
                 // Формирование дива .libraryBooking о доступности
                 if ($availability > 0)  {
                     $date = date('l');
+                    $date = 'Sunday';
                     $time = date('Hi');
 
                     if ($date == 'Friday' && $time >= 2000 || $date == 'Saturday' || $date == 'Sunday' || $date == 'Monday') {
                         // Следующий рабочий день — следующий вторник
-                        $nextWorkingDay = date('j.m', strtotime("next Tuesday"));
+                        $nextWorkingDay = date('j.m.Y', strtotime("next Tuesday"));
 
                         // Определение последнего вторника в месяце — санитарного дня
-                        $month = date('m');
-                        $daysInMonth = date('t');
-                        $year = date('Y');
-                        for ($i = 1; $i <= $daysInMonth; $i++) {
-                            if (date('w', strtotime("$i.$month.$year")) == 2)
-                                $cleanupDay = $i;
-                        }
-                        $cleanupDay .= ".$month"; // для даты формата 31.01
+                        $cleanupDay = date('j.m.Y', strtotime("last tuesday of this month"));
 
                         // Если следующий рабочий день — санитарный,
                         // значит, действительный следующий рабочий день — после
@@ -329,17 +323,16 @@ HERE;
                                 break;
                         }
 
-                        $nextWorkingDay = "<br>на $nextWorkingDay[0] $nextWorkingDay[1]";
+                        $nextWorkingDay = " на $nextWorkingDay[0] $nextWorkingDay[1]";
 
 
                         $hint = "<div class='hint'>
                                                     <div class='text'>
                                                         <b>Почему нельзя забронировать раньше</b>";
-
                         if ($date == 'Monday')
                             $hint .= "<p>По понедельникам библиотека закрыта для читателей.</p>";
                         else
-                            $hint .= "<p>1. Секретарь, который получает запросы на бронь, не работает по выходным.</p>
+                            $hint .= "<p>1. Человек, который делает бронь, не работает по выходным.</p>
                                       <p>2. По понедельникам библиотека закрыта для читателей.</p>";
 
                         $hint .= "</div>
@@ -347,32 +340,62 @@ HERE;
 
                     }
 
-                    echo $bookingButton = "<div class='libraryBookingButton'>
-                                            <button type='button' class='btn btn-outline-dark btn-sm' data-toggle='modal' data-target='#bookingForm'>Забронировать".$nextWorkingDay."…</button>
+
+                    // Если в учётной записи есть почта — бронирование книги в один клик
+                    $encryption = $_COOKIE["encryption"];
+                    // Подключение к базе данных
+                    global $ini;
+                    $link = mysqli_connect($ini[database][host], $ini[database][user], $ini[database][password], $ini[database][name]) or die('Ошибка');
+                    mysqli_set_charset($link, 'utf8');
+                    $result = mysqli_query($link, "SELECT * FROM readers WHERE encryption = '$encryption'");
+                    $row = mysqli_fetch_assoc($result);
+
+                    if ($row['email']) {
+                        $bookingButton = "<div class='libraryBookingButton'>
+                                                    <form class='formBooking'>
+                                                        <input name='email' type='hidden' value='$row[email]'>
+                                                        <input name='surname' type='hidden' value='$row[surname]'>
+                                                        <input name='titleBooking' type='hidden' value='$bookInfo_MGDB[title]'>
+                                                        <input name='author' type='hidden' value='$bookInfo_MGDB[author]'>
+                                                        <input name='publisher' type='hidden' value='$bookInfo_MGDB[publisher]'>
+                                                        <input name='year' type='hidden' value='$bookInfo_MGDB[year]'>
+                                                        <input name='pages' type='hidden' value='$bookInfo_MGDB[pages]'>
+                                                        <input name='callNumber' type='hidden' value='$bookInfo_MGDB[callNumber]'>
+                                                        <input class='btn btn-outline-dark' type='button' value='Забронировать".$nextWorkingDay."'>
+                                                    </form>
+                                                    $hint
+                                                    <div class='formProof'>
+                                                        <button class='btn btn-success' disabled>Забронирована</button>
+                                                    </div>
+                                          </div>";
+                    }
+                    else {
+                        $bookingButton = "<div class='libraryBookingButton'>
+                                            <button type='button' class='btn btn-outline-dark' data-toggle='modal' data-target='#bookingForm$bookInfo_MGDB[ISBN]' style='margin-right: 0;'>Забронировать".$nextWorkingDay."…</button>
                                             $hint
                                         
-                                            <div class='modal fade' id='bookingForm' tabindex='-1' role='dialog' aria-labelledby='bookingFormTitle' aria-hidden='true'>
+                                            <div class='modal fade' id='bookingForm$bookInfo_MGDB[ISBN]' tabindex='-1' role='dialog' aria-labelledby='bookingFormTitle' aria-hidden='true'>
                                                 <div class='modal-dialog modal-dialog-centered' role='document'>
-                                                    <div class='modal-contentformBooking'>
+                                                    <div class='modal-content formBooking'>
                                                           <div class='modal-header'>
                                                                 <h5 class='modal-title' id='exampleModalCenterTitle'>Бронирование книги</h5>
                                                                 <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
-                                                                  <span aria-hidden='true'>&times;</span>
+                                                                    <span aria-hidden='true'>&times;</span>
                                                                 </button>
                                                           </div>
-                                                          <form action='book.php' method='POST' id='formBooking'>
+                                                          <form>
                                                               <div class='modal-body'>
                                                                     <div class='form-group'>
-                                                                        <label for='email'>Ваша эл. почта</label>
-                                                                        <input type='email' class='form-control' id='email' name='email' aria-describedby='emailHelp' required>
-                                                                        <small id='emailHelp' class='form-text text-muted'>Библиотекарь подтвердит бронь или напишет в случае чего</small>
+                                                                        <label for='email$bookInfo_MGDB[ISBN]'>Ваша эл. почта</label>
+                                                                        <input type='email' class='form-control' id='email$bookInfo_MGDB[ISBN]' name='email' aria-describedby='emailHelp$bookInfo_MGDB[ISBN]' required>
+                                                                        <small id='emailHelp$bookInfo_MGDB[ISBN]' class='form-text text-muted'>Библиотекарь подтвердит бронь или напишет в случае чего</small>
                                                                     </div>
                                                                     <div class='form-group'>
-                                                                        <label for='surname'>Ваша фамилия</label>
-                                                                        <input type='text' class='form-control' id='surname' name='surname' aria-describedby='surnameHelp' required>
-                                                                        <small id='surnameHelp' class='form-text text-muted'>Назовёте в библиотеке</small>
+                                                                        <label for='surname$bookInfo_MGDB[ISBN]'>Ваша фамилия</label>
+                                                                        <input type='text' class='form-control' id='surname$bookInfo_MGDB[ISBN]' name='surname' aria-describedby='surnameHelp$bookInfo_MGDB[ISBN]' required>
+                                                                        <small id='surnameHelp$bookInfo_MGDB[ISBN]' class='form-text text-muted'>Назовёте в библиотеке</small>
                                                                     </div>
-                                                                    <input type='hidden' name='title' value='$bookInfo_MGDB[title]'>
+                                                                    <input type='hidden' name='titleBooking' value='$bookInfo_MGDB[title]'>
                                                                     <input type='hidden' name='author' value='$bookInfo_MGDB[author]'>
                                                                     <input type='hidden' name='publisher' value='$bookInfo_MGDB[publisher]'> 
                                                                     <input type='hidden' name='year' value='$bookInfo_MGDB[year]'>
@@ -381,19 +404,20 @@ HERE;
                                                                     <hr><div>Сайт запомнит вашу почту и фамилию. Когда будете снова бронировать, останется нажать кнопку</div>
                                                               </div>
                                                               <div class='modal-footer'>
-                                                                    <button name='toBook' class='btn btn-primary'>Забронировать$nextWorkingDay</button>
+                                                                    <input type='button' class='btn btn-primary' value='Забронировать'>
                                                               </div>
                                                           </form>
                                                     </div>
-                                                    <div class='formProof alert alert-success' role='alert' style='display: none;'>
+                                                    <div class='formProof alert alert-success' role='alert'>
                                                         <h4 class='alert-heading'>Книга забронирована</h4>
-                                                        <p>В Деловую библиотеку отправлено письмо с просьбой забронировать книгу на фамилию <span id='surnameAdd'>$surname</span>.</p>
+                                                        <p>В Деловую библиотеку отправлено письмо с просьбой забронировать книгу на фамилию <span class='surnameAdd'>$surname</span>.</p>
                                                         <p>Почту регулярно проверяет секретарь, он передаст просьбу библиотекарю. Библиотекарь отложит книгу, но он может не написать вам&nbsp;об этом.</p>
                                                         <p><i>Как забрать книгу.</i> Входите в библиотеку, идёте направо, говорите библиотекарю о брони, называете свою&nbsp;фамилию.</p>
                                                     </div>
                                                 </div>
                                             </div>
                                       </div>";
+                    }
 
                     $availabilityInfo = $availability . ' книг';
                     switch ($availability) {
@@ -435,13 +459,15 @@ HERE;
 
 
                 if ($libraryBooking != '')
-                    $libraryBooking = "<div class='libraryBooking'><div class='libraryBookingText'>$libraryBooking</div>$bookingButton</div>";
+                    $libraryBooking = "<div class='libraryBooking'>$bookingButton<div class='libraryBookingText'>$libraryBooking</div></div>";
+
+                $libraryTimetable = getTimetable('Деловая библиотека');
 
                 return $library = [
                     "name" => "Деловая библиотека",
                     "address" => "м. ВДНХ, ул. Бориса Галушкина, 19к1",
                     "website" => "http://mgdb.mos.ru/",
-                    "timetable" => 'Время работы',
+                    "timetable" => $libraryTimetable,
                     "availability" => $libraryBooking
                 ];
         }
@@ -917,7 +943,7 @@ HERE;
                                                 <input type='hidden' name='callNumber' value='$callNumber'>
                                                 <input type='button' class='btn btn-outline-dark' value='Забронировать'>
                                             </form>
-                                            <div class='formProof' style='display: none;'>
+                                            <div class='formProof'>
                                                 <button class='btn btn-success' disabled>Забронирована</button>
                                             </div>";
                 }
@@ -1032,7 +1058,7 @@ HERE;
                                                               </div>
                                                           </form>
                                                     </div>
-                                                    <div class='formProof alert alert-success' role='alert' style='display: none;'>
+                                                    <div class='formProof alert alert-success' role='alert'>
                                                         <h4 class='alert-heading'>Книга будет забронирована</h4>
                                                         <p>В библиотеку Некрасова отправлено письмо с просьбой забронировать книгу на фамилию <span class='surnameAdd'>$surname</span>.</p>
                                                         <p>Почту регулярно проверяют библиотекари, они отложат книгу и напишут&nbsp;вам.</p>
@@ -1319,9 +1345,11 @@ HERE;
         switch ($library) {
             case 'Библиотека Некрасова':
                 $library = 'nekrasovka';
+                $scheduleFirstDayOpen = 'Понедельник';
                 break;
             case 'Деловая библиотека':
                 $library = 'mgdb';
+                $scheduleFirstDayOpen = 'Вторник';
                 break;
         }
 
@@ -1354,7 +1382,7 @@ HERE;
                         <table>
                             <tbody>
                                 <tr>
-                                    <td>Понедельник — суббота:</td>
+                                    <td>$scheduleFirstDayOpen — суббота:</td>
                                     <td>10—22</td>
                                 </tr>
                                 <tr>
@@ -1363,7 +1391,7 @@ HERE;
                                 </tr>
                             </tbody>
                         </table>
-                        <p><img src="/img/cleanup-day.svg" alt="Закрыто на санитарный день">Последний вторник месяца</p>
+                        <p title="Закрыто на санитарный день"><img src="/img/cleanup-day.svg">Последний вторник месяца</p>
                     </div>
                 </div>
 HERE;

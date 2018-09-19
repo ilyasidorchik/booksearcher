@@ -64,7 +64,7 @@ function searchBook(bookTitle) {
                     if (bookingButtons.length > 0) {
                         for (var i = 0; i < bookingButtons.length; i++) {
                             bookingButtons[i].addEventListener('click', {handleEvent: toBook, number: i});
-                            let surname = document.getElementsByName('surname')[i];
+                            var surname = document.getElementsByName('surname')[i];
                             surname.addEventListener('blur', {handleEvent: printSurnameInFormProof, number: i, surname: surname});
                         }
                     }
@@ -183,7 +183,8 @@ function toBook(e) {
 // Сопутствующие функции
 function printSurnameInFormProof(e) {
     let textSurname = document.querySelectorAll('.surnameAdd')[this.number];
-    textSurname.innerHTML = this.surname.value;
+    let surnameValue = this.surname.value;
+    textSurname.innerHTML = surnameValue;
 }
 
 function controlSchedule(e) {
