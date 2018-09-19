@@ -36,7 +36,7 @@ function searchBook(bookTitle) {
         let xhr = new XMLHttpRequest();
         let params = 'bookTitle='+bookTitle,
             template = '<div class="row"><div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2"><div class="book"><div class="bookDesc"><h2>&nbsp;</h2><div class="details lead"> <span class="author">&nbsp;</span> <span class="publisher">&nbsp;</span> <span class="pages">&nbsp;</span></div></div></div></div></div><div class="row"><div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2"><div class="library"><div class="libraryDesc" style="width:20%"><div style="padding:0 40%" class="name">&nbsp;</div><div class="details"><div style="padding:0 50%" class="address">&nbsp;</div></div></div></div></div></div>',
-            alert = setTimeout(showSearchAlert, 5000, document.querySelector('.searchAlert'), 'Книга нашлась, библиотек много. Быстрее поиск работает с новыми книгами, которых немного, например <a href="http://dev.booksearcher.ru/found/Дизайн%20—%20это%20работа" class="static">Дизайн&nbsp;—&nbsp;это&nbsp;работа</a>');
+            alert = setTimeout(showSearchAlert, 5000, document.querySelector('.searchAlert'), '<b>Книга нашлась.</b> Проверяется в других библиотеках. С новыми книгами, которых немного, поиск работает быстрее');
         xhr.abort(); // отменяем предыдущий запрос
         document.getElementById('results').innerHTML=''; // очищаем контейнер для результатов
         for (let i=0;i<3;i++){ // цикл вставки шаблона в контейнер для результатов на время загрузки
