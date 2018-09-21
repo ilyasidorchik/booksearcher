@@ -54,6 +54,7 @@ HERE;
                                                 <input type="text" name="surname" class="form-control" id="surname" aria-describedby="surnameHelp" required>
                                                 <small id="surnameHelp" class="form-text text-muted">Для связи с библиотекарем</small>
                                             </div>
+                                            <hr><div>Сайт запомнит вашу почту и фамилию. Когда будете снова запрашивать, останется ввести автора</div>
 HERE;
         }
         else {
@@ -67,7 +68,6 @@ HERE;
         $title = typograf('«' . $bookTitle . '»');
 
         echo <<<HERE
-                                            <hr><div>Сайт запомнит вашу почту и фамилию. Когда будете снова запрашивать, останется ввести автора</div>
                                         </div>
                                         <div class="modal-footer">
                                             <input type="button" class="btn btn-primary" id="toRequest" value="Запросить">
