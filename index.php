@@ -14,6 +14,8 @@
         <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon-180x180.png">
         <link rel="apple-touch-icon-precomposed" href="/img/apple-touch-icon-180x180-precomposed.png">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+        <script src="/js/likely.js"></script>
+        <link rel="stylesheet" href="/css/likely.css">
         <?php
             if ($devMode)
                 echo '<link href="/css/styles.less" rel="stylesheet/less" type="text/css">';
@@ -32,7 +34,7 @@
                 <div class="searchСontainer">
                     <div class="row">
                         <div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
-                            <label for="searchInput"><h4>Поиск книг в библиотеках Москвы</h4></label>
+                            <label for="searchInput"><h4>Поиск книг в библиотеках&nbsp;Москвы</h4></label>
                             <form class="form-inline search">
                                 <input type="search" name="title" id="searchInput" class="form-control" placeholder="Название книги, автор или ISBN — что знаете" autofocus required>
                                 <button type="button" class="btn btn-primary ml-2" id="searchBtn">Найти</button>
@@ -46,9 +48,17 @@
         <footer class="index">
             <div class="container">
                 <div class="row">
-                    <div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
+                    <div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-9 offset-xl-2">
+                        <p><div class="likely" style="zoom: 1.15;">
+                            <div class="twitter">Твитнуть</div>
+                            <div class="facebook">Поделиться</div>
+                            <div class="odnoklassniki">Класснуть</div>
+                            <div class="vkontakte">Поделиться</div>
+                            <div class="whatsapp">Вотсапнуть</div>
+                            <div class="telegram">Отправить</div>
+                        </div></p>
                         <p>
-                            <a href="http://sidorchik.ru/blog/all/booksearcher-beta1/" class="static">О проекте</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="https://docs.google.com/document/d/1zHMqFfosGLYYG-jE6NskzIqpjWD23PU9avdPaAH0g3Q/edit?usp=sharing" class="static"><nobr>Библиотеки-участники</nobr></a>&nbsp;&nbsp;·&nbsp;&nbsp;<wbr>Поиск&nbsp;<a href="http://rgub.ru/searchopac/" class="static">по РГБМ</a> и&nbsp;<a href="https://libfl.ru/ru/item/catalogue" class="static">Рудомино</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="mailto:ilya@sidorchik.ru" class="static">ilya@sidorchik.ru</a>
+                            <a href="http://sidorchik.ru/blog/all/booksearcher-beta1/" class="static">О проекте</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="https://docs.google.com/document/d/1zHMqFfosGLYYG-jE6NskzIqpjWD23PU9avdPaAH0g3Q/edit?usp=sharing" class="static"><nobr>Библиотеки-участники</nobr></a>&nbsp;&nbsp;·&nbsp;&nbsp;<wbr>Поиск&nbsp;<a href="http://rgub.ru/searchopac/" class="static">по РГБМ</a>&nbsp;и&nbsp;<a href="https://libfl.ru/ru/item/catalogue" class="static">Рудомино</a>&nbsp;&nbsp;·&nbsp;&nbsp;<wbr><a href="mailto:ilya@sidorchik.ru" class="static">ilya@sidorchik.ru</a>
                         </p>
                         <p>
                             Разработчики <a href="http://sidorchik.ru/" class="static">Илья&nbsp;Сидорчик</a>, <a href="https://vk.com/romka023" class="static">Роман&nbsp;Мешков</a>, тайный советник <a href="http://blinov.design" class="static">Роберт&nbsp;Блинов</a><br>
