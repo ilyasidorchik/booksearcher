@@ -72,8 +72,10 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
         <?php
             if ($devMode)
-                echo '<script src="http://cdnjs.cloudflare.com/ajax/libs/less.js/3.0.0/less.min.js"></script>';
+                echo '<script src="http://cdnjs.cloudflare.com/ajax/libs/less.js/3.0.0/less.min.js"></script>
+                      <script src="/js/script.js"></script>';
+            else
+                echo '<script src="/js/scriptES2015.js"></script>';
         ?>
-        <script src="/js/script.js"></script>
     </body>
 </html>
