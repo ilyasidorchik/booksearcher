@@ -267,7 +267,6 @@ HERE;
                 // Формирование дива .libraryBooking о доступности
                 if ($availability > 0)  {
                     $date = date('l');
-                    $date = 'Sunday';
                     $time = date('Hi');
 
                     if ($date == 'Friday' && $time >= 2000 || $date == 'Saturday' || $date == 'Sunday' || $date == 'Monday') {
