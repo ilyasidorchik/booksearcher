@@ -9,6 +9,7 @@
         $year = $_POST['year'];
         $pages = $_POST['pages'];
         $callNumber = $_POST['callNumber'];
+        $library = $_POST['library'];
 
         // Подключение к базе данных
         include 'db_connection.php';
@@ -57,6 +58,6 @@
             $readerID = getReaderID($link, $encryption);
         }
 
-        sendEmailForBooking($email, $surname, $title, $author, $publisher, $year, $callNumber);
-        addToBooked($link, $readerID, $title, $author, $publisher, $year, $pages);
+        sendEmailForBooking($email, $surname, $title, $author, $publisher, $year, $callNumber, $library);
+        addToBooked($link, $readerID, $title, $author, $publisher, $year, $pages, $library);
     }

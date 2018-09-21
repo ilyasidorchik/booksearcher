@@ -159,7 +159,8 @@ function toBook(e) {
         let year = document.getElementsByName('year')[this.number].value;
         let pages = document.getElementsByName('pages')[this.number].value;
         let callNumber = document.getElementsByName('callNumber')[this.number].value;
-        let params = 'email=' + email + '&surname=' + surname + '&title=' + title + '&author=' + author + '&publisher=' + publisher + '&year=' + year + '&pages=' + pages + '&callNumber=' + callNumber;
+        let library = document.getElementsByName('library')[this.number].value;
+        let params = 'email=' + email + '&surname=' + surname + '&title=' + title + '&author=' + author + '&publisher=' + publisher + '&year=' + year + '&pages=' + pages + '&callNumber=' + callNumber + '&library=' + library;
 
         let xhr = new XMLHttpRequest();
         xhr.open('POST', '../php/book.php'); // определяем тип запроса и ссылку на обработчик запроса

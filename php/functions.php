@@ -267,7 +267,6 @@ HERE;
                 // Формирование дива .libraryBooking о доступности
                 if ($availability > 0)  {
                     $date = date('l');
-                    $date = 'Sunday';
                     $time = date('Hi');
 
                     if ($date == 'Friday' && $time >= 2000 || $date == 'Saturday' || $date == 'Sunday' || $date == 'Monday') {
@@ -361,6 +360,7 @@ HERE;
                                                         <input name='year' type='hidden' value='$bookInfo_MGDB[year]'>
                                                         <input name='pages' type='hidden' value='$bookInfo_MGDB[pages]'>
                                                         <input name='callNumber' type='hidden' value='$bookInfo_MGDB[callNumber]'>
+                                                        <input name='library' type='hidden' value='Деловая библиотека'>
                                                         <input class='btn btn-outline-dark' type='button' value='Забронировать".$nextWorkingDay."'>
                                                     </form>
                                                     $hint
@@ -401,6 +401,7 @@ HERE;
                                                                     <input type='hidden' name='year' value='$bookInfo_MGDB[year]'>
                                                                     <input type='hidden' name='pages' value='$bookInfo_MGDB[pages]'>
                                                                     <input type='hidden' name='callNumber' value='$bookInfo_MGDB[callNumber]'>
+                                                                    <input name='library' type='hidden' value='Деловая библиотека'>
                                                                     <hr><div>Сайт запомнит вашу почту и фамилию. Когда будете снова бронировать, останется нажать кнопку</div>
                                                               </div>
                                                               <div class='modal-footer'>
@@ -941,6 +942,7 @@ HERE;
                                                 <input type='hidden' name='year' value='$bookInfo_SKBM[year]'>
                                                 <input type='hidden' name='pages' value='$bookInfo_SKBM[pages]'>
                                                 <input type='hidden' name='callNumber' value='$callNumber'>
+                                                <input name='library' type='hidden' value='Некрасовка'>
                                                 <input type='button' class='btn btn-outline-dark' value='Забронировать'>
                                             </form>
                                             <div class='formProof'>
@@ -1051,6 +1053,7 @@ HERE;
                                                                     <input type='hidden' name='year' value='$bookInfo_SKBM[year]'>
                                                                     <input type='hidden' name='pages' value='$bookInfo_SKBM[pages]'>
                                                                     <input type='hidden' name='callNumber' value='$callNumber'>
+                                                                    <input name='library' type='hidden' value='Некрасовка'>
                                                                     <hr><div>Сайт запомнит вашу почту и фамилию. Когда будете снова бронировать, останется нажать кнопку</div>
                                                                 </div>
                                                               <div class='modal-footer'>
@@ -1456,13 +1459,22 @@ HERE;
         return $dates;
     }
 
-    function sendEmailForBooking($email, $surname, $title, $author, $publisher, $year, $callNumber) {
+    function sendEmailForBooking($email, $surname, $title, $author, $publisher, $year, $callNumber, $library) {
         $titleQuoted = '«' . $title . '»';
         global $devMode;
-        if ($devMode)
+        if ($devMode) {
             $to = 'ilya@sidorchik.ru';
-        else
-            $to = 'abonement@nekrasovka.ru';
+        }
+        else {
+            switch ($library) {
+                case 'Деловая библиотека':
+                    $to = 'mgdb@culture.mos.ru';
+                    break;
+                case 'Некрасовка':
+                    $to = 'abonement@nekrasovka.ru';
+                    break;
+            }
+        }
         $title = "Бронирование книги $titleQuoted";
         $headers  = 'MIME-Version: 1.0' . "\r\n";
         $headers .= "Content-type: text/html; charset=utf-8 \r\n";
@@ -1521,8 +1533,8 @@ HERE;
         return $row['readerID'];
     }
 
-    function addToBooked($link, $readerID, $title, $author, $publisher, $year, $pages) {
-        mysqli_query($link, "INSERT INTO `booked` (`id`, `readerID`, `bookTitle`, `bookAuthor`, `bookPublisher`, `bookYear`, `bookPages`, `libraryName`, `libraryAddress`, `libraryTimetable`) VALUES (NULL, '$readerID', '$title', '$author', '$publisher', '$year', '$pages', 'Деловая библиотека', 'м. ВДНХ, ул. Бориса Галушкина, 19к1', 'http://mgdb.mos.ru/contacts/info/')");
+    function addToBooked($link, $readerID, $title, $author, $publisher, $year, $pages, $library) {
+        mysqli_query($link, "INSERT INTO `booked` (`id`, `readerID`, `bookTitle`, `bookAuthor`, `bookPublisher`, `bookYear`, `bookPages`, `libraryName`, `libraryAddress`, `libraryTimetable`) VALUES (NULL, '$readerID', '$title', '$author', '$publisher', '$year', '$pages', '$library', 'м. ВДНХ, ул. Бориса Галушкина, 19к1', 'http://mgdb.mos.ru/contacts/info/')");
     }
 
     function addToWishlist($link, $readerID, $title, $author, $publisher, $year, $pages) {
