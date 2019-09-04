@@ -1,0 +1,6 @@
+# Passwords
+.api.ini
+.htpasswd
+
+# PhpStorm
+.idea/
