@@ -1,6 +1,7 @@
 # Passwords
-.api.ini
+app.ini
 .htpasswd
 
 # PhpStorm
 .idea/
+.DS_Store
