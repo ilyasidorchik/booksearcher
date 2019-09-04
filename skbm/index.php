@@ -474,8 +474,8 @@ HERE;
                 $longitudeFrom = $jsonGeocoder["results"][0]["geometry"]["location"]["lng"];
 
                 // Подключение к базе данных с таблицей метро
-                include '../php/db_connection.php';
-                $link = mysqli_connect($host, $user, $password, $database) or die("Не удалось подключиться к базе данных");
+                $ini = parse_ini_file('../app.ini', true);
+                $link = mysqli_connect($ini[database][host], $ini[database][user], $ini[database][password], $ini[database][name]) or die('Ошибка');
 
                 // Определение ближайшего метро путём перебора
                 $min = 10000000;
