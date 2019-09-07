@@ -49,20 +49,22 @@
             <div class="container">
                 <div class="row">
                     <div class="col-sm-12 col-md-12 col-lg-10 offset-lg-1 col-xl-9 offset-xl-2">
-                        <p><div class="likely" style="zoom: 1.15;">
-                            <div class="twitter">Твитнуть</div>
-                            <div class="facebook">Поделиться</div>
-                            <div class="odnoklassniki">Класснуть</div>
-                            <div class="vkontakte">Поделиться</div>
-                            <div class="whatsapp">Вотсапнуть</div>
-                            <div class="telegram">Отправить</div>
-                        </div></p>
-                        <p>
-                            <a href="http://sidorchik.ru/blog/all/booksearcher-beta1/" class="static">О проекте</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="https://docs.google.com/document/d/1zHMqFfosGLYYG-jE6NskzIqpjWD23PU9avdPaAH0g3Q/edit?usp=sharing" class="static"><nobr>Библиотеки-участники</nobr></a>&nbsp;&nbsp;·&nbsp;&nbsp;<wbr>Поиск&nbsp;<a href="http://rgub.ru/searchopac/" class="static">по РГБМ</a>&nbsp;и&nbsp;<a href="https://libfl.ru/ru/item/catalogue" class="static">Рудомино</a>&nbsp;&nbsp;·&nbsp;&nbsp;<wbr><a href="mailto:ilya@sidorchik.ru" class="static">ilya@sidorchik.ru</a>
-                        </p>
-                        <p>
-                            Разработчики <a href="http://sidorchik.ru/" class="static">Илья&nbsp;Сидорчик</a>, <a href="https://vk.com/romka023" class="static">Роман&nbsp;Мешков</a>, тайный советник <a href="http://blinov.design" class="static">Роберт&nbsp;Блинов</a><br>
-                        </p>
+	                    <!--noindex-->
+	                        <p><div class="likely" style="zoom: 1.15;">
+	                            <div class="twitter">Твитнуть</div>
+	                            <div class="facebook">Поделиться</div>
+	                            <div class="odnoklassniki">Класснуть</div>
+	                            <div class="vkontakte">Поделиться</div>
+	                            <div class="whatsapp">Вотсапнуть</div>
+	                            <div class="telegram">Отправить</div>
+	                        </div></p>
+	                        <p>
+	                            <a href="http://sidorchik.ru/blog/all/booksearcher-beta1/" class="static">О проекте</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="https://docs.google.com/document/d/1zHMqFfosGLYYG-jE6NskzIqpjWD23PU9avdPaAH0g3Q/edit?usp=sharing" class="static"><nobr>Библиотеки-участники</nobr></a>&nbsp;&nbsp;·&nbsp;&nbsp;<wbr>Поиск&nbsp;<a href="http://rgub.ru/searchopac/" class="static">по РГБМ</a>&nbsp;и&nbsp;<a href="https://libfl.ru/ru/item/catalogue" class="static">Рудомино</a>&nbsp;&nbsp;·&nbsp;&nbsp;<wbr><a href="mailto:ilya@sidorchik.ru" class="static">ilya@sidorchik.ru</a>
+	                        </p>
+	                        <p>
+	                            Разработчики <a href="http://sidorchik.ru/" class="static">Илья&nbsp;Сидорчик</a>, <a href="https://vk.com/romka023" class="static">Роман&nbsp;Мешков</a>, тайный советник <a href="http://blinov.design" class="static">Роберт&nbsp;Блинов</a><br>
+	                        </p>
+		                <!--/noindex-->
                     </div>
                 </div>
             </div>
