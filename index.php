@@ -37,7 +37,7 @@
                             <label for="searchInput"><h4>Поиск книг в библиотеках&nbsp;Москвы</h4></label>
                             <form class="form-inline search">
                                 <input type="search" name="title" id="searchInput" class="form-control" placeholder="Название книги, автор или ISBN — что знаете" autofocus required>
-                                <button type="button" class="btn btn-primary ml-2" id="searchBtn">Найти</button>
+                                <button type="button" class="btn btn-primary ml-2" id="searchBtn" onclick="ym(58833859, 'reachGoal', 'FIND_BUTTON'); return true;">Найти</button>
                             </form>
                         </div>
                     </div>
