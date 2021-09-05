@@ -28,6 +28,29 @@
         <![endif]-->
     </head>
     <body>
+        <style>
+            .farewell {
+                margin: 0;
+                padding: 7px 5px 8px;
+                
+                background: #c22;
+
+                text-align: center;
+                color: #fff;
+            }
+            a.farewell__link {
+                border-bottom-color: rgba(255, 255, 255, 0.5) !important;
+
+                color: #fff !important;
+            }
+            a.farewell__link:hover {
+                opacity: 0.75;
+            }
+        </style>
+        <p class="farewell" role="alert">
+            Спасибо, что были с нами.
+            Теперь есть официальный сервис «<a href="https://www.mos.ru/knigi/?utm_source=booksearcher.ru" class="farewell__link">Библиотеки Москвы</a>»
+        </p>
         <div class="searchAlert"></div>
         <main class="mt-4">
             <div class="container">
